@@ -124,7 +124,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ./.github/actions/setup-mise
-    - run: mise run test:node
+    # Use old pnpm approach to reproduce Redis race condition (issue #515)
+    - run: pnpm install
+    - run: pnpm run --recursive test
     - name: Breakpoint if tests failed
       if: failure()
       uses: namespacelabs/breakpoint-action@v0
