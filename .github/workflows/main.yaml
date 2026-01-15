@@ -333,6 +333,12 @@ jobs:
           sleep 30
           ((attempt++))
         done
+    - name: Breakpoint if publish failed
+      if: failure()
+      uses: namespacelabs/breakpoint-action@v0
+      with:
+        duration: 30m
+        authorized-users: sij411
 
   # ===========================================================================
   # Push-only jobs: Create GitHub release (tag only)
