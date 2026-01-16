@@ -7,7 +7,7 @@
 # See build.yaml for details on why this separation is required for npm's
 # trusted publishing (OIDC).
 name: main
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref }}
