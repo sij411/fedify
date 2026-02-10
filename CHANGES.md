@@ -3,6 +3,26 @@
 Fedify changelog
 ================
 
+Version 2.0.0
+-------------
+
+To be released.
+
+### @fedify/cli
+
+ -  Added TOML configuration file support for persisting CLI options.
+    Configuration files are loaded hierarchically from system, user, and
+    project directories, with later files taking precedence.  [[#265]]
+
+     -  Added `--config` (`-C`) option to specify a custom configuration file
+        path.
+     -  Added `--ignore-config` option to skip loading configuration files.
+     -  Configuration options are now bound to commands: `lookup`, `webfinger`,
+        `tunnel`, and `relay`.
+
+[#265]: https://github.com/fedify-dev/fedify/issues/265
+
+
 Version 1.10.3
 --------------
 
