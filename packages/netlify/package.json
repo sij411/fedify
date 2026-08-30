@@ -58,6 +58,7 @@
     "@js-temporal/polyfill": "catalog:",
     "@netlify/database": "catalog:",
     "@standard-schema/spec": "catalog:",
+    "@netlify/blobs": "catalog:",
     "@types/node": "catalog:",
     "netlify-cli": "catalog:",
     "postgres": "catalog:",

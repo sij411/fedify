@@ -5,6 +5,7 @@
   "imports": {
     "@netlify/database": "npm:@netlify/database@^1.1.0",
     "@netlify/async-workloads": "npm:@netlify/async-workloads@^0.0.106",
+    "@netlify/blobs": "npm:@netlify/blobs@^11.0.1",
     "postgres": "npm:postgres@^3.4.7"
   },
   "exports": {
