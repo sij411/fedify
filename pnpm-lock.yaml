@@ -33,6 +33,9 @@ catalogs:
     '@netlify/async-workloads':
       specifier: ^0.0.106
       version: 0.0.106
+    '@netlify/blobs':
+      specifier: ^11.0.1
+      version: 11.0.2
     '@netlify/database':
       specifier: ^1.1.0
       version: 1.1.0
@@ -1648,6 +1651,9 @@ importers:
       '@js-temporal/polyfill':
         specifier: 'catalog:'
         version: 0.5.1
+      '@netlify/blobs':
+        specifier: 'catalog:'
+        version: 11.0.2
       '@netlify/database':
         specifier: 'catalog:'
         version: 1.1.0(@cloudflare/workers-types@4.20260511.1)(@electric-sql/pglite@0.3.16)(better-sqlite3@12.9.0)(bun-types@1.3.3)(mysql2@3.22.3(@types/node@22.19.1))(postgres@3.4.7)
@@ -4981,6 +4987,10 @@ packages:
     resolution: {integrity: sha512-NEM8aNAMZCCWBWymomMM/fn5wmPGyGE8pendgsSu5mL7UNz+aXqGcHS0MiHWU/osyg+geiZuS+Rx956SVrMM/w==}
     engines: {node: ^14.16.0 || >=16.0.0}
 
+  '@netlify/blobs@11.0.2':
+    resolution: {integrity: sha512-raH28PHHQ1OPAYBCkE+DOnUTS/1nYFTRiFhvO6kuowkdhPiOsvX3XR/IjhePhP8aUsH5quBwcqQ3GaOgnIwmEw==}
+    engines: {node: '>=22.12.0'}
+
   '@netlify/blobs@8.2.0':
     resolution: {integrity: sha512-9djLZHBKsoKk8XCgwWSEPK9QnT8qqxEQGuYh48gFIcNLvpBKkLnHbDZuyUxmNemCfDz7h0HnMXgSPnnUVgARhg==}
     engines: {node: ^14.16.0 || >=16.0.0}
@@ -5063,6 +5073,10 @@ packages:
   '@netlify/dev-utils@4.4.6':
     resolution: {integrity: sha512-P6X+xS3glvhiTX6AAocYvnZtqXtWhvxMX4AdPgv2iw6cXjGL2criUveX7bSjp6DiyHfvQpNdG0ZRpeBEVAFf1g==}
     engines: {node: ^18.14.0 || >=20}
+
+  '@netlify/dev-utils@6.0.1':
+    resolution: {integrity: sha512-q5g70dO3q/M/XTBQz7uIECJxVlJoS8UBlzpjf22DV6q61UzXa8EONTPXPmvisrFcUi1I3AUKplPcHGQYZZj+Vw==}
+    engines: {node: '>=22.12.0'}
 
   '@netlify/dev@4.18.7':
     resolution: {integrity: sha512-BeXz9dis2Iid5EcOItVj2srdC30R4RwDhsk/N/h+T2WYrJbyhOj6b1IS+6fVGe5JbKe9fDiGANH1cujplX1+rw==}
@@ -5246,6 +5260,10 @@ packages:
     resolution: {integrity: sha512-NIjIjB/aItiXKB6+wzSwfSyYqbNsVSzzlEPryxxTC5ZJiYSYSm82wAOcQ+9VdiufQyZO5t8jzHVPULo7a9L9sQ==}
     engines: {node: ^18.14.0 || >=20.6.1}
 
+  '@netlify/otel@7.0.2':
+    resolution: {integrity: sha512-MHEsRJTZtOCrLa2fR+Y3GN51rvgxUHazuRVxuWuG7R1qzwynXAZB20Ufwp7BxKSTKcp7LNVEnKAZ/k2ytVmYvQ==}
+    engines: {node: '>=22.12.0'}
+
   '@netlify/plugins-list@6.81.8':
     resolution: {integrity: sha512-ur/f3aO+TaBI1OQEmWnHcYaenizj0hAgoB1n3Pff+S1dddqSwwFmw5Z7MWaXqvaRrkVUyxiRT5IgeKdt4CW7Hg==}
     engines: {node: ^14.14.0 || >=16.0.0}
@@ -5277,6 +5295,10 @@ packages:
   '@netlify/runtime-utils@2.3.0':
     resolution: {integrity: sha512-cW8weDvsKV7zfia2m5EcBy6KILGoPD+eYZ3qWNGnIo05DGF28goPES0xKSDkNYgAF/2rRSIhie2qcBhbGVgSRg==}
     engines: {node: ^18.14.0 || >=20}
+
+  '@netlify/runtime-utils@3.0.0':
+    resolution: {integrity: sha512-OHo40+V3QZkR+UrDjqhN+LekrAby/dSSJxsvyYs9i88E/mSl3goB/ysoL+VYROm190egxmQyRYlHK7vL4GeHBQ==}
+    engines: {node: '>=22.12.0'}
 
   '@netlify/runtime@4.1.25':
     resolution: {integrity: sha512-+RKE+oaygMDyp1ybcseQRT/OMVkiNOgUDfM0Q4+Nwl+vMGCZavmHKIAkGWRWlduw8UUcA094xSoHNcLQWCFgjg==}
@@ -5758,6 +5780,10 @@ packages:
     resolution: {integrity: sha512-Cdq0jW2lknrNfrAm92MyEAvpe2cRsKjdnQLHUL6xRA4IVUnsWx6P65E7NcUO0Y+L4w1Aee5iV8FvjSwd+lrs9A==}
     engines: {node: '>=8.0.0'}
 
+  '@opentelemetry/api-logs@0.221.0':
+    resolution: {integrity: sha512-OlanaW1vv7ufTqQ3/fPLI4arGt5ZoM+P8abOMki6uEYnpRazepSWDwDnnw+la7kE26SHVC18//SMccrDvLKOXQ==}
+    engines: {node: '>=8.0.0'}
+
   '@opentelemetry/api-logs@0.53.0':
     resolution: {integrity: sha512-8HArjKx+RaAI8uEIgcORbZIPklyh1YLjPSBus8hjRmvLi6DeFzgOcdZ7KwPabKj8mXF8dX0hyfAyGfycz0DbFw==}
     engines: {node: '>=14'}
@@ -5790,6 +5816,12 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
+  '@opentelemetry/context-async-hooks@2.10.0':
+    resolution: {integrity: sha512-bvyMcgLEkozzSzpEEEo1OMoeQ97bxj6Qs2uN3mPrSdDvObMI1myffD/BPqcLlzZO9//d1SqQA/WPw7Cz2AiqhA==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.0.0 <1.10.0'
+
   '@opentelemetry/context-async-hooks@2.5.0':
     resolution: {integrity: sha512-uOXpVX0ZjO7heSVjhheW2XEPrhQAWr2BScDPoZ9UDycl5iuHG+Usyc3AIfG6kZeC1GyLpMInpQ6X5+9n69yOFw==}
     engines: {node: ^18.19.0 || >=20.6.0}
@@ -5805,6 +5837,12 @@ packages:
   '@opentelemetry/core@1.30.1':
     resolution: {integrity: sha512-OOCM2C/QIURhJMuKaekP3TRBxBKxG/TWWA0TL2J6nXUtDnuCtccy49LUJF8xPFXMX+0LMcxFpCo8M9cGY1W6rQ==}
     engines: {node: '>=14'}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.0.0 <1.10.0'
+
+  '@opentelemetry/core@2.10.0':
+    resolution: {integrity: sha512-/wNZ8twnEQQA4HoHu22+vcsdru6pWPWxW+7w+FlxT6Id7PE/WIbZmVKkte+PF72e0F2dnImFeHD2syyE1Mw6MQ==}
+    engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
@@ -6042,6 +6080,12 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
 
+  '@opentelemetry/instrumentation@0.221.0':
+    resolution: {integrity: sha512-cCk80Z/iRDf/5gfsKMB4f74LqVA5yKETB/9ojPzVW/6/f70iu89nJvGxsFCxx4XfSohaOofkU19kiYm84AiAlw==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': ^1.3.0
+
   '@opentelemetry/instrumentation@0.53.0':
     resolution: {integrity: sha512-DMwg0hy4wzf7K73JJtl95m/e0boSoWhH07rfvHvYzQtBD3Bmv0Wc1x733vyZBqmFm8OjJD0/pfiUg1W3JjFX0A==}
     engines: {node: '>=14'}
@@ -6100,6 +6144,12 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
+  '@opentelemetry/resources@2.10.0':
+    resolution: {integrity: sha512-q6MMm2zhggzsHVNbabYwut+a6nbuQQe3URUoxaojM/8K1IBfwwPzvxIjNi2/lI1TFe+fMHMW9MWhrtDLEXEnkA==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.3.0 <1.10.0'
+
   '@opentelemetry/resources@2.5.0':
     resolution: {integrity: sha512-F8W52ApePshpoSrfsSk1H2yJn9aKjCrbpQF1M9Qii0GHzbfVeFUB+rc3X4aggyZD8x9Gu3Slua+s6krmq6Dt8g==}
     engines: {node: ^18.19.0 || >=20.6.0}
@@ -6142,6 +6192,12 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
+  '@opentelemetry/sdk-trace-base@2.10.0':
+    resolution: {integrity: sha512-GuYQQT7QD2EeO8lcZLRQzcbOyhqAzL+6WWTKTU9mSUBYBazkEDl+VrQcXQhbB08OWM9anD1aHleVadzulpOaUQ==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.3.0 <1.10.0'
+
   '@opentelemetry/sdk-trace-base@2.5.0':
     resolution: {integrity: sha512-VzRf8LzotASEyNDUxTdaJ9IRJ1/h692WyArDBInf5puLCjxbICD6XkHgpuudis56EndyS7LYFmtTMny6UABNdQ==}
     engines: {node: ^18.19.0 || >=20.6.0}
@@ -6154,6 +6210,12 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
+  '@opentelemetry/sdk-trace-node@2.10.0':
+    resolution: {integrity: sha512-GZK/G6oZyBLGlH1pUgeDch7D91KoHd2uotUGIkWCPi9GI5T9X0p4L7nNAMDR1BQjkRYoDqo+ddfVx9t5Uhys+Q==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.0.0 <1.10.0'
+
   '@opentelemetry/sdk-trace-node@2.5.0':
     resolution: {integrity: sha512-O6N/ejzburFm2C84aKNrwJVPpt6HSTSq8T0ZUMq3xT2XmqT4cwxUItcL5UWGThYuq8RTcbH8u1sfj6dmRci0Ow==}
     engines: {node: ^18.19.0 || >=20.6.0}
@@ -6165,6 +6227,12 @@ packages:
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
+
+  '@opentelemetry/sdk-trace@2.10.0':
+    resolution: {integrity: sha512-MfQGq3GRmTh5fM/y+OjaO0vj6+luCB1XO2gfXCalKCfgKw0eHL++sm75DNweC6ohlp+aFvACqeE0fYayqdRaoQ==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
   '@opentelemetry/semantic-conventions@1.27.0':
     resolution: {integrity: sha512-sAay1RrB+ONOem0OZanAR1ZI/k7yDpnOQSQmTMuGImUQb2y8EbSaCJ94FQluM74xoU03vlb2d2U90hZluL6nQg==}
@@ -8958,6 +9026,10 @@ packages:
 
   '@whatwg-node/server@0.10.18':
     resolution: {integrity: sha512-kMwLlxUbduttIgaPdSkmEarFpP+mSY8FEm+QWMBRJwxOHWkri+cxd8KZHO9EMrB9vgUuz+5WEaCawaL5wGVoXg==}
+    engines: {node: '>=18.0.0'}
+
+  '@whatwg-node/server@0.11.0':
+    resolution: {integrity: sha512-VSdkwnJRr8Yv9UgB2aXB3VUPWwd6Oqnn0hycFwhg9pZgWxJXb7JmhsiXe9tmpMwjHFxli12PGcz9aI63YYloGQ==}
     engines: {node: '>=18.0.0'}
 
   '@whatwg-node/server@0.9.71':
@@ -20878,6 +20950,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@netlify/blobs@11.0.2':
+    dependencies:
+      '@netlify/dev-utils': 6.0.1
+      '@netlify/otel': 7.0.2
+      '@netlify/runtime-utils': 3.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   '@netlify/blobs@8.2.0': {}
 
   '@netlify/blobs@9.1.2':
@@ -21525,6 +21605,20 @@ snapshots:
       semver: 7.8.0
       tmp-promise: 3.0.3
 
+  '@netlify/dev-utils@6.0.1':
+    dependencies:
+      '@whatwg-node/server': 0.11.0
+      ansis: 4.3.0
+      atomically: 2.1.1
+      chokidar: 5.0.0
+      decache: 4.6.2
+      dettle: 1.0.5
+      dot-prop: 9.0.0
+      empathic: 2.0.1
+      env-paths: 3.0.0
+      parse-gitignore: 2.0.0
+      semver: 7.8.0
+
   '@netlify/dev@4.18.7(db0@0.3.4(@electric-sql/pglite@0.3.16)(better-sqlite3@12.9.0)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260511.1)(@electric-sql/pglite@0.3.16)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/better-sqlite3@7.6.13)(@types/pg@8.6.1)(better-sqlite3@12.9.0)(bun-types@1.3.3)(mysql2@3.22.3(@types/node@24.3.0))(pg@8.22.0)(postgres@3.4.7))(mysql2@3.22.3(@types/node@24.3.0)))(ioredis@5.10.1)(rollup@4.60.2)':
     dependencies:
       '@netlify/ai': 0.4.2
@@ -21924,6 +22018,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@netlify/otel@7.0.2':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/instrumentation': 0.221.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/resources': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace-node': 2.10.0(@opentelemetry/api@1.9.1)
+    transitivePeerDependencies:
+      - supports-color
+
   '@netlify/plugins-list@6.81.8': {}
 
   '@netlify/redirect-parser@15.0.4':
@@ -21952,6 +22056,8 @@ snapshots:
   '@netlify/runtime-utils@2.2.0': {}
 
   '@netlify/runtime-utils@2.3.0': {}
+
+  '@netlify/runtime-utils@3.0.0': {}
 
   '@netlify/runtime@4.1.25':
     dependencies:
@@ -23125,6 +23231,10 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
 
+  '@opentelemetry/api-logs@0.221.0':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+
   '@opentelemetry/api-logs@0.53.0':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -23151,6 +23261,10 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
 
+  '@opentelemetry/context-async-hooks@2.10.0(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+
   '@opentelemetry/context-async-hooks@2.5.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -23167,6 +23281,11 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/semantic-conventions': 1.28.0
+
+  '@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/semantic-conventions': 1.40.0
 
   '@opentelemetry/core@2.5.0(@opentelemetry/api@1.9.1)':
     dependencies:
@@ -23514,6 +23633,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@opentelemetry/instrumentation@0.221.0(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/api-logs': 0.221.0
+      import-in-the-middle: 3.3.1
+      require-in-the-middle: 8.0.1(supports-color@10.2.2)
+    transitivePeerDependencies:
+      - supports-color
+
   '@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -23593,6 +23721,12 @@ snapshots:
       '@opentelemetry/core': 1.30.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.28.0
 
+  '@opentelemetry/resources@2.10.0(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/semantic-conventions': 1.40.0
+
   '@opentelemetry/resources@2.5.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -23667,6 +23801,14 @@ snapshots:
       '@opentelemetry/resources': 1.30.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.28.0
 
+  '@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/resources': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/semantic-conventions': 1.40.0
+
   '@opentelemetry/sdk-trace-base@2.5.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -23688,6 +23830,13 @@ snapshots:
       '@opentelemetry/resources': 2.7.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.40.0
 
+  '@opentelemetry/sdk-trace-node@2.10.0(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/context-async-hooks': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace-base': 2.10.0(@opentelemetry/api@1.9.1)
+
   '@opentelemetry/sdk-trace-node@2.5.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -23701,6 +23850,13 @@ snapshots:
       '@opentelemetry/context-async-hooks': 2.7.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/core': 2.7.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 2.7.1(@opentelemetry/api@1.9.0)
+
+  '@opentelemetry/sdk-trace@2.10.0(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/resources': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/semantic-conventions': 1.40.0
 
   '@opentelemetry/semantic-conventions@1.27.0': {}
 
@@ -24801,7 +24957,7 @@ snapshots:
       - react-native-b4a
       - supports-color
 
-  '@stackbit/cms-contentful@0.4.56(debug@4.4.1)':
+  '@stackbit/cms-contentful@0.4.56(debug@4.4.1)(graphql@16.14.2)':
     dependencies:
       '@contentful/rich-text-types': 15.15.1
       '@stackbit/cms-core': 2.0.1(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)
@@ -24815,6 +24971,7 @@ snapshots:
       - bare-buffer
       - debug
       - encoding
+      - graphql
       - react-native-b4a
       - supports-color
 
@@ -24890,28 +25047,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@stackbit/cms-git@0.4.18':
-    dependencies:
-      '@stackbit/artisanal-names': 1.0.1
-      '@stackbit/cms-core': 2.0.1(@types/react@19.1.8)(graphql@16.14.2)
-      '@stackbit/sdk': 2.0.1
-      '@stackbit/types': 1.0.1
-      '@stackbit/utils': 0.4.19
-      axios: 0.24.0
-      fs-extra: 11.3.6
-      git-url-parse: 13.1.1
-      lodash: 4.18.1
-      micromatch: 4.0.8
-      slugify: 1.6.9
-    transitivePeerDependencies:
-      - bare-abort-controller
-      - bare-buffer
-      - debug
-      - encoding
-      - react-native-b4a
-      - supports-color
-
-  '@stackbit/cms-git@0.4.18(debug@4.4.1)':
+  '@stackbit/cms-git@0.4.18(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)':
     dependencies:
       '@stackbit/artisanal-names': 1.0.1
       '@stackbit/cms-core': 2.0.1(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)
@@ -24925,12 +25061,43 @@ snapshots:
       micromatch: 4.0.8
       slugify: 1.6.9
     transitivePeerDependencies:
+      - '@types/react'
       - bare-abort-controller
       - bare-buffer
+      - bufferutil
+      - canvas
       - debug
       - encoding
+      - graphql
       - react-native-b4a
       - supports-color
+      - utf-8-validate
+
+  '@stackbit/cms-git@0.4.18(@types/react@19.1.8)(graphql@16.14.2)':
+    dependencies:
+      '@stackbit/artisanal-names': 1.0.1
+      '@stackbit/cms-core': 2.0.1(@types/react@19.1.8)(graphql@16.14.2)
+      '@stackbit/sdk': 2.0.1
+      '@stackbit/types': 1.0.1
+      '@stackbit/utils': 0.4.19
+      axios: 0.24.0
+      fs-extra: 11.3.6
+      git-url-parse: 13.1.1
+      lodash: 4.18.1
+      micromatch: 4.0.8
+      slugify: 1.6.9
+    transitivePeerDependencies:
+      - '@types/react'
+      - bare-abort-controller
+      - bare-buffer
+      - bufferutil
+      - canvas
+      - debug
+      - encoding
+      - graphql
+      - react-native-b4a
+      - supports-color
+      - utf-8-validate
 
   '@stackbit/cms-sanity@0.2.56(@types/react@19.1.8)':
     dependencies:
@@ -24959,7 +25126,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@stackbit/cms-sanity@0.2.56(@types/react@19.1.8)(debug@4.4.1)':
+  '@stackbit/cms-sanity@0.2.56(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)':
     dependencies:
       '@sanity/block-tools': 2.36.6
       '@sanity/client': 3.4.1
@@ -24982,6 +25149,7 @@ snapshots:
       - canvas
       - debug
       - encoding
+      - graphql
       - react-native-b4a
       - supports-color
       - utf-8-validate
@@ -24992,7 +25160,7 @@ snapshots:
       '@stackbit/artisanal-names': 1.0.1
       '@stackbit/cms-contentful': 0.4.56
       '@stackbit/cms-core': 2.0.1(@types/react@19.1.8)(graphql@16.14.2)
-      '@stackbit/cms-git': 0.4.18
+      '@stackbit/cms-git': 0.4.18(@types/react@19.1.8)(graphql@16.14.2)
       '@stackbit/cms-sanity': 0.2.56(@types/react@19.1.8)
       '@stackbit/sdk': 2.0.1
       '@stackbit/types': 1.0.1
@@ -25026,14 +25194,14 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@stackbit/dev-common@0.5.51(@types/react@19.1.8)(debug@4.4.1)':
+  '@stackbit/dev-common@0.5.51(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)':
     dependencies:
       '@iarna/toml': 2.2.5
       '@stackbit/artisanal-names': 1.0.1
-      '@stackbit/cms-contentful': 0.4.56(debug@4.4.1)
+      '@stackbit/cms-contentful': 0.4.56(debug@4.4.1)(graphql@16.14.2)
       '@stackbit/cms-core': 2.0.1(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)
-      '@stackbit/cms-git': 0.4.18(debug@4.4.1)
-      '@stackbit/cms-sanity': 0.2.56(@types/react@19.1.8)(debug@4.4.1)
+      '@stackbit/cms-git': 0.4.18(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)
+      '@stackbit/cms-sanity': 0.2.56(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)
       '@stackbit/sdk': 2.0.1
       '@stackbit/types': 1.0.1
       '@stackbit/utils': 0.4.19
@@ -25062,6 +25230,7 @@ snapshots:
       - canvas
       - debug
       - encoding
+      - graphql
       - react-native-b4a
       - supports-color
       - utf-8-validate
@@ -25069,8 +25238,8 @@ snapshots:
   '@stackbit/dev@1.0.35(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)':
     dependencies:
       '@stackbit/cms-core': 2.0.1(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)
-      '@stackbit/cms-git': 0.4.18(debug@4.4.1)
-      '@stackbit/dev-common': 0.5.51(@types/react@19.1.8)(debug@4.4.1)
+      '@stackbit/cms-git': 0.4.18(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)
+      '@stackbit/dev-common': 0.5.51(@types/react@19.1.8)(debug@4.4.1)(graphql@16.14.2)
       '@stackbit/sdk': 2.0.1
       axios: 0.25.0(debug@4.4.1)
       chalk: 4.1.2
@@ -25104,7 +25273,7 @@ snapshots:
   '@stackbit/dev@1.0.35(@types/react@19.1.8)(graphql@16.14.2)':
     dependencies:
       '@stackbit/cms-core': 2.0.1(@types/react@19.1.8)(graphql@16.14.2)
-      '@stackbit/cms-git': 0.4.18
+      '@stackbit/cms-git': 0.4.18(@types/react@19.1.8)(graphql@16.14.2)
       '@stackbit/dev-common': 0.5.51(@types/react@19.1.8)
       '@stackbit/sdk': 2.0.1
       axios: 0.25.0
@@ -26949,6 +27118,14 @@ snapshots:
       tslib: 2.8.1
 
   '@whatwg-node/server@0.10.18':
+    dependencies:
+      '@envelop/instrumentation': 1.0.0
+      '@whatwg-node/disposablestack': 0.0.6
+      '@whatwg-node/fetch': 0.10.13
+      '@whatwg-node/promise-helpers': 1.3.2
+      tslib: 2.8.1
+
+  '@whatwg-node/server@0.11.0':
     dependencies:
       '@envelop/instrumentation': 1.0.0
       '@whatwg-node/disposablestack': 0.0.6
