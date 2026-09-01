@@ -1,14 +1,23 @@
 import type {
-  KvKey,
-  KvStore,
-  KvStoreListEntry,
-  KvStoreSetOptions,
-} from "@fedify/fedify";
+    KvKey,
+    KvStore,
+    KvStoreListEntry,
+    KvStoreSetOptions,
+} from "@fedify/fedify/federation";
 import type { Store } from "@netlify/blobs";
 
+/**
+ * A key-value store that uses Netlify Blobs.
+ * 
+ * @since 2.4.0
+ */
 export class NetlifyBlobsKvStore implements KvStore {
   readonly #store: Store;
 
+  /** 
+   * Creates a new Netlify Blobs-backed key-value store.
+   * @param store The Netlify Blobs store to use.
+  */
   constructor(store: Store) {
     this.#store = store;
   }
