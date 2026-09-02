@@ -115,3 +115,21 @@ describe("NetlifyBlobsKvStore key encoding", () => {
     );
   });
 });
+
+describe("NetlifyBlobsKvStore.cas()", () => {
+  it("conditionally replaces a value with a tombstone", async () => {
+    const store = new MockStore();
+    const kv = createKv(store);
+    await kv.set(["deleted"], "value");
+
+    deepStrictEqual(await kv.cas(["deleted"], "wrong", undefined), false);
+    deepStrictEqual(await kv.cas(["deleted"], "value", undefined), true);
+    deepStrictEqual(await kv.get(["deleted"]), undefined);
+    deepStrictEqual(await collect(kv.list(["deleted"])), []);
+    deepStrictEqual(store.entries.get('["deleted"]')?.data, null);
+    deepStrictEqual(
+      store.entries.get('["deleted"]')?.metadata,
+      { tombstone: true },
+    );
+  });
+});

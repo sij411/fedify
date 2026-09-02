@@ -44,6 +44,20 @@ export class NetlifyBlobsKvStore implements KvStore {
     return this.serializeKey(prefix).slice(0, -1);
   }
 
+  private isAbsent(metadata: Record<string, unknown>): boolean {
+    if (metadata.tombstone === true) return true;
+    const expireIn = metadata.expireIn;
+    return typeof expireIn === "number" &&
+      expireIn <= Temporal.Now.instant().epochMilliseconds;
+  }
+
+  private getEtag(entry: { readonly etag?: string } | null): string {
+    if (entry?.etag == null) {
+      throw new Error("Netlify Blobs did not return an ETag.");
+    }
+    return entry.etag;
+  }
+
   /**
    * {@inheritDoc KvStore.get}
    */
@@ -52,16 +66,7 @@ export class NetlifyBlobsKvStore implements KvStore {
       type: "json",
     });
 
-    if (result === null) return undefined;
-
-    const expireIn = result.metadata.expireIn;
-
-    if (
-      typeof expireIn === "number" &&
-      expireIn <= Temporal.Now.instant().epochMilliseconds
-    ) {
-      return undefined;
-    }
+    if (result === null || this.isAbsent(result.metadata)) return undefined;
     return result.data as T;
   }
 
@@ -128,31 +133,27 @@ export class NetlifyBlobsKvStore implements KvStore {
         type: "json",
       });
 
-      let currentValue;
-      // Get only valid data from the fetched entry
-      if (entry === null) {
-        currentValue = undefined;
-      } else {
-        const expireIn = entry.metadata.expireIn;
+      const currentValue = entry === null || this.isAbsent(entry.metadata)
+        ? undefined
+        : entry.data;
 
-        if (
-          typeof expireIn === "number" &&
-          expireIn <= Temporal.Now.instant().epochMilliseconds
-        ) {
-          currentValue = undefined;
-        } else {
-          currentValue = entry.data;
-        }
-      }
-
-      if (!isEqual(currentValue ?? undefined, expectedValue)) return false;
+      if (!isEqual(currentValue, expectedValue)) return false;
 
       if (entry === null && newValue === undefined) {
         return true;
       }
 
-      const storedValue = newValue === undefined ? null : newValue;
       const serializedKey = this.serializeKey(key);
+
+      if (newValue === undefined) {
+        const result = await this.#store.setJSON(serializedKey, null, {
+          onlyIfMatch: this.getEtag(entry),
+          metadata: { tombstone: true },
+        });
+        if (result.modified) return true;
+        continue;
+      }
+
       const metadata = {
         "expireIn": options?.ttl == null
           ? null
@@ -161,12 +162,12 @@ export class NetlifyBlobsKvStore implements KvStore {
       };
 
       const result = entry === null
-        ? await this.#store.setJSON(serializedKey, storedValue, {
+        ? await this.#store.setJSON(serializedKey, newValue, {
           onlyIfNew: true,
           metadata: metadata,
         })
-        : await this.#store.setJSON(serializedKey, storedValue, {
-          onlyIfMatch: entry.etag,
+        : await this.#store.setJSON(serializedKey, newValue, {
+          onlyIfMatch: this.getEtag(entry),
           metadata: metadata,
         });
 
