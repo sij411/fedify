@@ -7,6 +7,8 @@ import type {
 import type { Store } from "@netlify/blobs";
 import { isEqual } from "es-toolkit";
 
+const MAX_BLOB_KEY_BYTES = 600;
+
 /**
  * A key-value store that uses Netlify Blobs.
  *
@@ -24,11 +26,22 @@ export class NetlifyBlobsKvStore implements KvStore {
   }
 
   private serializeKey(key: KvKey): string {
-    return JSON.stringify(key);
+    const serialized = JSON.stringify(key);
+    if (new TextEncoder().encode(serialized).byteLength > MAX_BLOB_KEY_BYTES) {
+      throw new RangeError(
+        "The encoded key exceeds Netlify Blobs' 600-byte key limit.",
+      );
+    }
+    return serialized;
   }
 
   private deserializeKey(key: string): KvKey {
     return JSON.parse(key) as KvKey;
+  }
+
+  private serializePrefix(prefix?: KvKey): string {
+    if (prefix == null) return "[";
+    return this.serializeKey(prefix).slice(0, -1);
   }
 
   /**
@@ -81,11 +94,9 @@ export class NetlifyBlobsKvStore implements KvStore {
    * {@inheritDoc KvStore.list}
    */
   async *list(prefix?: KvKey): AsyncIterable<KvStoreListEntry> {
-    const serializedPrefix = prefix ? `${this.serializeKey(prefix)}` : "";
-
     const pages = this.#store.list({
       paginate: true,
-      prefix: serializedPrefix,
+      prefix: this.serializePrefix(prefix),
     });
     for await (const page of pages) {
       for (const blob of page.blobs) {
