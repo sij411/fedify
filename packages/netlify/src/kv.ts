@@ -41,7 +41,7 @@ export class NetlifyBlobsKvStore implements KvStore {
 
     if (result === null) return undefined;
 
-    const expireIn = result.metadata.expiresIn;
+    const expireIn = result.metadata.expireIn;
 
     if (
       typeof expireIn === "number" &&
@@ -122,11 +122,11 @@ export class NetlifyBlobsKvStore implements KvStore {
       if (entry === null) {
         currentValue = undefined;
       } else {
-        const expiresIn = entry.metadata.expiresIn;
+        const expireIn = entry.metadata.expireIn;
 
         if (
-          typeof expiresIn === "number" &&
-          expiresIn <= Temporal.Now.instant().epochMilliseconds
+          typeof expireIn === "number" &&
+          expireIn <= Temporal.Now.instant().epochMilliseconds
         ) {
           currentValue = undefined;
         } else {
