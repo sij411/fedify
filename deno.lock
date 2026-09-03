@@ -91,7 +91,10 @@
     "npm:@nestjs/common@^11.0.1": "11.1.19_reflect-metadata@0.2.2_rxjs@7.8.2",
     "npm:@netlify/async-workloads@^0.0.106": "0.0.106_@google-cloud+storage@5.20.5_@trpc+server@11.18.0__typescript@5.9.3_@types+react@19.2.17_autoprefixer@10.5.2__postcss@8.5.19_graphql@16.14.2_postcss@8.5.19_react@19.2.7_react-dom@19.2.7__react@19.2.7_rollup@4.60.1_tailwindcss@3.4.19__tsx@4.21.0__yaml@2.9.0_tsx@4.21.0_yaml@2.9.0",
     "npm:@netlify/blobs@^11.0.1": "11.0.2",
+<<<<<<< HEAD
     "npm:@netlify/database@^1.1.0": "1.1.0_@electric-sql+pglite@0.5.8",
+=======
+>>>>>>> fae6a8d2 (Use Blob KV in Netlify Dev fixture)
     "npm:@nuxt/kit@4": "4.4.2",
     "npm:@nuxt/schema@4": "4.4.2",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
@@ -3603,9 +3606,6 @@
         "@tybys/wasm-util"
       ]
     },
-    "@neondatabase/serverless@1.1.0": {
-      "integrity": "sha512-r3ZZhRjEcfEdKIZnoB1RusNgvHuaBRqfCzV4Gi+5A9yUX0S4HTws/ASWqt13wL4y4I+0rqsWGdA2w7EQXHi3+Q=="
-    },
     "@nestjs/common@11.1.19_reflect-metadata@0.2.2_rxjs@7.8.2": {
       "integrity": "sha512-qeiTt2tv+e5QyDKqG8HlVZb2wx64FEaSGFJouqTSRs+kG44iTfl3xlz1XqVped+rihx4hmjWgL5gkhtdK3E6+Q==",
       "dependencies": [
@@ -4045,9 +4045,6 @@
     },
     "@netlify/runtime-utils@2.2.0": {
       "integrity": "sha512-K3kWIxIMucibzQsATU2xw2JI+OpS9PZfPW/a+81gmeLC8tLv5YAxTVT0NFY/3imk1kcOJb9g7658jPLqDJaiAw=="
-    },
-    "@netlify/runtime-utils@2.3.0": {
-      "integrity": "sha512-cW8weDvsKV7zfia2m5EcBy6KILGoPD+eYZ3qWNGnIo05DGF28goPES0xKSDkNYgAF/2rRSIhie2qcBhbGVgSRg=="
     },
     "@netlify/runtime-utils@3.0.0": {
       "integrity": "sha512-OHo40+V3QZkR+UrDjqhN+LekrAby/dSSJxsvyYs9i88E/mSl3goB/ysoL+VYROm190egxmQyRYlHK7vL4GeHBQ=="
@@ -13258,53 +13255,6 @@
     "perfect-debounce@2.1.0": {
       "integrity": "sha512-LjgdTytVFXeUgtHZr9WYViYSM/g8MkcTPYDlPa3cDqMirHjKiSZPYd6DoL7pK8AJQr+uWkQvCjHNdiMqsrJs+g=="
     },
-    "pg-cloudflare@1.4.0": {
-      "integrity": "sha512-Vo7z/6rrQYxpNRylp4Tlob2elzbh+N/MOQbxFVWCxS7oEx6jF53GTJFxK2WWpKuBRkmiin4Mt+xofFDjx09R0A=="
-    },
-    "pg-connection-string@2.14.0": {
-      "integrity": "sha512-XwWDGcLRGCXAR8F/AM5bG7Q+A3Wm2s6QeEjlOKZLlH3UYcguiqCWKyWXVag5TLTIjR7oOJUY8kcADaZgWPyLeg=="
-    },
-    "pg-int8@1.0.1": {
-      "integrity": "sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw=="
-    },
-    "pg-pool@3.14.0_pg@8.22.0": {
-      "integrity": "sha512-gKtPkFdQPU3DksooVLi9LsjZxrsBUZIpa+7aVx+LV5pNh0KzP4Zleud2po+ConrxbuXGBJ6Hfer6hdgpIBpBaw==",
-      "dependencies": [
-        "pg"
-      ]
-    },
-    "pg-protocol@1.15.0": {
-      "integrity": "sha512-cq9sECI5s0+uPUXjbz8ioyPJni6RzsRib0US67i5IoTZKw8fNeYlVE7u8F4dG7vEJJtc5wdD1K189lCCUwqWTQ=="
-    },
-    "pg-types@2.2.0": {
-      "integrity": "sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==",
-      "dependencies": [
-        "pg-int8",
-        "postgres-array",
-        "postgres-bytea",
-        "postgres-date",
-        "postgres-interval"
-      ]
-    },
-    "pg@8.22.0": {
-      "integrity": "sha512-8wih1vVIBMxoUM2oB4soJsD9tDnDpLv4OXBJ+EJzFsvycD+lfyIreC2gGHq78f8jbLLt+bvlPTFdFZfJkOuzAA==",
-      "dependencies": [
-        "pg-connection-string",
-        "pg-pool",
-        "pg-protocol",
-        "pg-types",
-        "pgpass"
-      ],
-      "optionalDependencies": [
-        "pg-cloudflare"
-      ]
-    },
-    "pgpass@1.0.5": {
-      "integrity": "sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==",
-      "dependencies": [
-        "split2"
-      ]
-    },
     "piccolore@0.1.3": {
       "integrity": "sha512-o8bTeDWjE086iwKrROaDf31K0qC/BENdm15/uH9usSC/uZjJOKb2YGiVHfLY4GhwsERiPI1jmwI2XrA7ACOxVw=="
     },
@@ -13472,21 +13422,6 @@
         "nanoid",
         "picocolors",
         "source-map-js"
-      ]
-    },
-    "postgres-array@2.0.0": {
-      "integrity": "sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA=="
-    },
-    "postgres-bytea@1.0.1": {
-      "integrity": "sha512-5+5HqXnsZPE65IJZSMkZtURARZelel2oXUEO8rH83VS/hxH5vv1uHquPg5wZs8yMAfdv971IU+kcPUczi7NVBQ=="
-    },
-    "postgres-date@1.0.7": {
-      "integrity": "sha512-suDmjLVQg78nMK2UZ454hAG+OAW+HQPZ6n++TNDUX+L0+uUlLywnoxJKDou51Zm+zTCjrCl0Nq6J9C5hP9vK/Q=="
-    },
-    "postgres-interval@1.2.0": {
-      "integrity": "sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==",
-      "dependencies": [
-        "xtend"
       ]
     },
     "postgres@3.4.9": {
@@ -16160,6 +16095,7 @@
         "xml-name-validator"
       ]
     },
+<<<<<<< HEAD
     "waddler@0.1.1_@electric-sql+pglite@0.5.8_@neondatabase+serverless@1.1.0_mysql2@3.22.3__@types+node@24.12.2_pg@8.22.0_postgres@3.4.9": {
       "integrity": "sha512-lBJXYFBLEpYe+scAeCJmLj6Iqweuq1whM6Am3I9WfopOCFxvKz8Nq5hXoy8/b3zwJqHIQMglFIvM4skRydSpZg==",
       "dependencies": [
@@ -16177,6 +16113,8 @@
         "postgres"
       ]
     },
+=======
+>>>>>>> fae6a8d2 (Use Blob KV in Netlify Dev fixture)
     "wasm-feature-detect@1.8.0": {
       "integrity": "sha512-zksaLKM2fVlnB5jQQDqKXXwYHLQUVH9es+5TOOHwGOVJOCeRBCiPjwSg+3tN2AdTCzjgli4jijCH290kXb/zWQ=="
     },
@@ -16638,6 +16576,14 @@
       "integrity": "sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A=="
     }
   },
+  "remote": {
+    "https://edge.netlify.com/": "fd941d61d88673d5f28aab283fb86fcc50f08a3bc80ee5470498fcfa88c65cfb",
+    "https://edge.netlify.com/bootstrap/config.ts": "6a2ce0e544e15e8f8883a5c18da5948e37fd0f2619f68cb31f3af53c51817025",
+    "https://edge.netlify.com/bootstrap/context.ts": "e97240232121e2f369f6546ce961490f34d961ea1ea54be3ff09633e3f08373f",
+    "https://edge.netlify.com/bootstrap/cookie.ts": "8b0baae708989ca183c6f3b4ab3d029e6abcbc2e43f93edeb0ff447b3bbc3a05",
+    "https://edge.netlify.com/bootstrap/edge_function.ts": "b8253e86aa83c67341f5cfedeba5049d77fbf84dcab7eceff7566b7728ae9b39",
+    "https://edge.netlify.com/bootstrap/globals/types.ts": "eaa6148ded3121d8dee62dd91c86e7fe76601df0f3ca8d7962243a30f4c8935f"
+  },
   "workspace": {
     "dependencies": [
       "jsr:@david/dax@~0.46.1",
@@ -16889,9 +16835,7 @@
       "packages/netlify": {
         "dependencies": [
           "npm:@netlify/async-workloads@^0.0.106",
-          "npm:@netlify/blobs@^11.0.1",
-          "npm:@netlify/database@^1.1.0",
-          "npm:postgres@^3.4.7"
+          "npm:@netlify/blobs@^11.0.1"
         ]
       },
       "packages/nuxt": {

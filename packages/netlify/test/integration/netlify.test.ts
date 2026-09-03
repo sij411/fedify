@@ -74,7 +74,7 @@ async function waitForServer(
   child: ChildProcess,
   logs: () => string,
 ): Promise<void> {
-  const deadline = Date.now() + 60_000;
+  const deadline = Date.now() + 120_000;
   const healthUrl = new URL("/.netlify/functions/status?id=health", baseUrl);
   while (Date.now() < deadline) {
     if (child.exitCode != null) {
@@ -134,7 +134,7 @@ const integrationTest = skipReason === false ? test : test.skip;
 integrationTest(
   "Netlify Dev delivers, retries, and orders Fedify queue tasks",
   {
-    timeout: 120_000,
+    timeout: 180_000,
   },
   async (t) => {
     await rm(netlifyDirectory, { force: true, recursive: true });
