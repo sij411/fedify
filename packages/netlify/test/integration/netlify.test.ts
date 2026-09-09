@@ -129,6 +129,22 @@ interface Status {
   };
 }
 
+async function callBlobKv(
+  baseUrl: URL,
+  body: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  const response = await fetch(
+    new URL("/.netlify/functions/blob-kv", baseUrl),
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  equal(response.status, 200, await response.clone().text());
+  return await response.json() as Record<string, unknown>;
+}
+
 const integrationTest = skipReason === false ? test : test.skip;
 
 integrationTest(
@@ -189,6 +205,88 @@ integrationTest(
     });
 
     await waitForServer(baseUrl, child, () => output);
+
+    await t.test(
+      "persists values and performs conditional writes",
+      async () => {
+        const id = crypto.randomUUID();
+        try {
+          deepStrictEqual(
+            await callBlobKv(baseUrl, {
+              action: "set",
+              id,
+              value: { state: "persisted" },
+            }),
+            { written: true },
+          );
+          deepStrictEqual(await callBlobKv(baseUrl, { action: "get", id }), {
+            found: true,
+            value: { state: "persisted" },
+          });
+
+          await callBlobKv(baseUrl, { action: "delete", id });
+          deepStrictEqual(
+            await callBlobKv(baseUrl, {
+              action: "cas",
+              id,
+              newValue: "created",
+            }),
+            { swapped: true },
+          );
+          deepStrictEqual(
+            await callBlobKv(baseUrl, {
+              action: "cas",
+              id,
+              newValue: "duplicate",
+            }),
+            { swapped: false },
+          );
+          deepStrictEqual(
+            await callBlobKv(baseUrl, {
+              action: "cas",
+              expectedValue: "created",
+              id,
+              newValue: "updated",
+            }),
+            { swapped: true },
+          );
+          deepStrictEqual(
+            await callBlobKv(baseUrl, {
+              action: "cas",
+              expectedValue: "created",
+              id,
+              newValue: "stale",
+            }),
+            { swapped: false },
+          );
+          deepStrictEqual(
+            await callBlobKv(baseUrl, {
+              action: "cas",
+              expectedValue: "updated",
+              id,
+            }),
+            { swapped: true },
+          );
+          deepStrictEqual(await callBlobKv(baseUrl, { action: "get", id }), {
+            found: false,
+          });
+          deepStrictEqual(
+            await callBlobKv(baseUrl, {
+              action: "cas",
+              id,
+              newValue: "recreated",
+            }),
+            { swapped: true },
+          );
+          deepStrictEqual(await callBlobKv(baseUrl, { action: "get", id }), {
+            found: true,
+            value: "recreated",
+          });
+        } finally {
+          await callBlobKv(baseUrl, { action: "delete", id });
+        }
+      },
+    );
 
     await t.test("delivers a task through the workload function", async () => {
       const id = crypto.randomUUID();
