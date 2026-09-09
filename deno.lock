@@ -62,6 +62,7 @@
     "jsr:@std/net@^1.0.6": "1.0.6",
     "jsr:@std/path@0.224": "0.224.0",
     "jsr:@std/path@1": "1.1.5",
+    "jsr:@std/path@^1.0.4": "1.1.5",
     "jsr:@std/path@^1.0.6": "1.1.5",
     "jsr:@std/path@^1.1.0": "1.1.5",
     "jsr:@std/path@^1.1.1": "1.1.5",
@@ -69,16 +70,18 @@
     "jsr:@std/path@^1.1.5": "1.1.5",
     "jsr:@std/semver@^1.0.6": "1.0.8",
     "jsr:@std/testing@0.224": "0.224.0",
+    "jsr:@std/url@~0.225.1": "0.225.1",
     "jsr:@std/uuid@^1.0.9": "1.1.1",
     "jsr:@std/yaml@^1.0.8": "1.1.0",
     "jsr:@valibot/valibot@^1.4.0": "1.4.1",
     "npm:@alinea/suite@~0.6.3": "0.6.3",
     "npm:@astrojs/node@^11.0.2": "11.0.2_astro@7.0.9__@netlify+blobs@11.0.3_@netlify+blobs@11.0.3",
+    "npm:@babel/core@^7.28.0": "7.29.7",
     "npm:@babel/preset-react@^7.27.1": "7.28.5_@babel+core@7.29.7",
     "npm:@cfworker/json-schema@^4.1.1": "4.1.1",
     "npm:@cloudflare/vitest-pool-workers@~0.8.31": "0.8.71_vitest@3.2.4__@types+node@24.12.2__yaml@2.9.0_@cloudflare+workers-types@4.20260511.1",
     "npm:@cloudflare/workers-types@^4.20260511.1": "4.20260511.1",
-    "npm:@deno/astro-adapter@0.6": "0.6.0_@opentelemetry+api@1.9.1_astro@7.0.9__@netlify+blobs@11.0.2_@netlify+blobs@11.0.2",
+    "npm:@deno/astro-adapter@0.6": "0.6.0_@opentelemetry+api@1.9.1_astro@7.0.9__@netlify+blobs@11.0.3_@netlify+blobs@11.0.3",
     "npm:@electric-sql/pglite@~0.5.8": "0.5.8",
     "npm:@fxts/core@^1.21.1": "1.26.0",
     "npm:@hongminhee/localtunnel@0.5": "0.5.0",
@@ -90,8 +93,7 @@
     "npm:@multiformats/base-x@^4.0.1": "4.0.1",
     "npm:@nestjs/common@^11.0.1": "11.1.19_reflect-metadata@0.2.2_rxjs@7.8.2",
     "npm:@netlify/async-workloads@^0.0.106": "0.0.106_@google-cloud+storage@5.20.5_@trpc+server@11.18.0__typescript@5.9.3_@types+react@19.2.17_autoprefixer@10.5.2__postcss@8.5.19_graphql@16.14.2_postcss@8.5.19_react@19.2.7_react-dom@19.2.7__react@19.2.7_rollup@4.60.1_tailwindcss@3.4.19__tsx@4.21.0__yaml@2.9.0_tsx@4.21.0_yaml@2.9.0",
-    "npm:@netlify/blobs@^11.0.1": "11.0.2",
-    "npm:@netlify/database@^1.1.0": "1.1.0_@electric-sql+pglite@0.5.8",
+    "npm:@netlify/blobs@^11.0.3": "11.0.3",
     "npm:@nuxt/kit@4": "4.4.2",
     "npm:@nuxt/schema@4": "4.4.2",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
@@ -283,6 +285,7 @@
         "jsr:@std/fmt@^1.0.7",
         "jsr:@std/media-types@1",
         "jsr:@std/path@1",
+        "npm:@babel/core",
         "npm:@babel/preset-react",
         "npm:@prefresh/vite",
         "npm:@remix-run/node-fetch-server",
@@ -482,6 +485,12 @@
         "jsr:@std/fmt@0.224",
         "jsr:@std/fs@0.224",
         "jsr:@std/path@0.224"
+      ]
+    },
+    "@std/url@0.225.1": {
+      "integrity": "7961f62f0a3cd2c7aa5b785822874132760b50bbf5ed0ccfded8668f203e7a95",
+      "dependencies": [
+        "jsr:@std/path@^1.0.4"
       ]
     },
     "@std/uuid@1.1.1": {
@@ -3872,16 +3881,6 @@
       ],
       "scripts": true
     },
-    "@netlify/database@1.1.0_@electric-sql+pglite@0.5.8": {
-      "integrity": "sha512-Y36JMyQfxwHxvtFzF8K+2PyooGFQXzPNINw/guujQfMujfAwUTwv7f6XiSL3c5orNy8YZTqVVWVjkbFarhDRjw==",
-      "dependencies": [
-        "@neondatabase/serverless",
-        "@netlify/runtime-utils@2.3.0",
-        "pg",
-        "waddler",
-        "ws@8.21.0"
-      ]
-    },
     "@netlify/dev-utils@2.2.0": {
       "integrity": "sha512-5XUvZuffe3KetyhbWwd4n2ktd7wraocCYw10tlM+/u/95iAz29GjNiuNxbCD1T6Bn1MyGc4QLVNKOWhzJkVFAw==",
       "dependencies": [
@@ -6997,8 +6996,7 @@
     "autoprefixer@10.5.2_postcss@8.5.19": {
       "integrity": "sha512-rD5t5DwOjJdmSORcTq64j8MawTC+tbQ+HHqjR4NDumamy/ambn1UJrlKL+KdwujWxMkFjPM3pPHOEA9tl4767Q==",
       "dependencies": [
-        "browserslist",
-        "caniuse-lite",
+        "caniuse-lite@1.0.30001805",
         "fraction.js",
         "picocolors",
         "postcss",
@@ -7151,8 +7149,8 @@
     "base64id@2.0.0": {
       "integrity": "sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog=="
     },
-    "baseline-browser-mapping@2.10.43": {
-      "integrity": "sha512-AjYpR78kDWAY3Efj+cDTFH9t9SCoL7OoTp1BOb0mQV7S+6CiLwnWM3FyxhJtdPufDFKzmCSFoUncKjWgJEZTCQ==",
+    "baseline-browser-mapping@2.11.21": {
+      "integrity": "sha512-uh8vpY/1/YyFkunIDFH/12p7/7VdPKA1hejMVEbdkEaWnUz0Hesvx5EbiU6XxjyHZIOju+ZMbQJkRh+es3/spQ==",
       "bin": true
     },
     "before-after-hook@2.2.3": {
@@ -7269,11 +7267,11 @@
         "fill-range"
       ]
     },
-    "browserslist@4.28.6": {
-      "integrity": "sha512-FQBYNK15VMslhLHpA7+n+n1GOlF1kId2xcCg7/j95f24AOF6VDYMNH4mFxF7KuaTdv627faazpOAjFzMrfJOUw==",
+    "browserslist@4.28.9": {
+      "integrity": "sha512-EWazOblFYUvlGZcfGhPUPmYh3nikUxBVb+y9MJun5f3hBi812X+8MSQTujLBtgK3cf51fJWbWfOjyeO954d+Eg==",
       "dependencies": [
         "baseline-browser-mapping",
-        "caniuse-lite",
+        "caniuse-lite@1.0.30001810",
         "electron-to-chromium",
         "node-releases",
         "update-browserslist-db"
@@ -7430,6 +7428,9 @@
     },
     "caniuse-lite@1.0.30001805": {
       "integrity": "sha512-52noaS3DubycKSXaU30TwPGIp+POyQSUVa5jBEq3vkRkY0kjyb3LQgvhU6WGyCcyXqVLWO0Cw0Q6BSdD0kUfVA=="
+    },
+    "caniuse-lite@1.0.30001810": {
+      "integrity": "sha512-TITQPUkaz+aVk5GL6NhOdwk1aEaNTSDPsGFWrTuhKGtjTF70jL/Oht2W4c6rXUe5fu7Ie19VIahAXHIIiWWNeg=="
     },
     "canonicalize@2.1.0": {
       "integrity": "sha512-F705O3xrsUtgt98j7leetNhTWPe+5S72rlL5O4jA1pKqBVQ/dT1O1D6PFxmSXvc0SUOinWS57DKx0I3CHrXJHQ==",
@@ -8636,8 +8637,8 @@
     "ee-first@1.1.1": {
       "integrity": "sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow=="
     },
-    "electron-to-chromium@1.5.389": {
-      "integrity": "sha512-cEto7aeOqBfU1D+c5py5pE+ooscKE75JifxLBdFUZsqAxRS6y7kebtxAZvICszSl05gPjYHDTjY+lXpyGvpJbg=="
+    "electron-to-chromium@1.5.423": {
+      "integrity": "sha512-rRZfTSY8ptHYMQxa+uIycJMFKmY1T0GIApNMXJYGehguTZa56TEEl19pKPCoBqk5Gpf7QizZn/jt7xur+DYxag=="
     },
     "elysia@1.4.29_typescript@6.0.3": {
       "integrity": "sha512-GwMRGGwSdjfPt+w3LA0fqTuYJtS8uVRJicvoar98/HrO5qdFKDc9CwjIb6Kja+v39lkY+58hr2JvdR9jQzlUuA==",
@@ -12709,8 +12710,8 @@
     "node-object-hash@2.3.10": {
       "integrity": "sha512-jY5dPJzw6NHd/KPSfPKJ+IHoFS81/tJ43r34ZeNMXGzCOM8jwQDCD12HYayKIB6MuznrnqIYy2e891NA2g0ibA=="
     },
-    "node-releases@2.0.51": {
-      "integrity": "sha512-wRNIrw4DmVLKQlbgOMdkMx27Wrpzes2hh5Jtbi2bjPd+4wJstWIqP5A+lscnqbm0xxmT5Bpg8Lec5ItEBwx6BQ=="
+    "node-releases@2.0.54": {
+      "integrity": "sha512-YHs7BmmcsdAI5Ozuf8JZo6PT0mv2GIWC9vMfvUC3dp65M8hn7Ux8CPL+2oBI7juNuj9d0ndhTcznq2ODBps9cQ=="
     },
     "node-source-walk@7.0.2": {
       "integrity": "sha512-71kFFjYaSshDTA8/a2HiTYPLdASWjLJxUyJxGE+ffxU+KhxSBtM9kiLUX+R2yooFdSFKMFpi4n3PFtDy6qXv8A==",
@@ -15797,8 +15798,8 @@
         "pkg-types@2.3.0"
       ]
     },
-    "update-browserslist-db@1.2.3_browserslist@4.28.6": {
-      "integrity": "sha512-Js0m9cx+qOgDxo0eMiFGEueWztz+d4+M3rGlmKPT+T4IS/jP4ylw3Nwpu6cpTTP8R1MAC1kF4VbdLt3ARf209w==",
+    "update-browserslist-db@1.3.2_browserslist@4.28.9": {
+      "integrity": "sha512-UQ+MSxlhRm1bzjhU+DcuXfjFO1FzNtqhK5+9Yvlp90ItDLk5vT932A0rFu619nf7RVS+Y/VeaUW1jaRDqZ8VJw==",
       "dependencies": [
         "browserslist",
         "escalade",
@@ -16090,23 +16091,6 @@
       "integrity": "sha512-d+BFHzbiCx6zGfz0HyQ6Rg69w9k19nviJspaj4yNscGjrHu94sVP+aRm75yEbCh+r2/yR+7q6hux9LVtbuTGBw==",
       "dependencies": [
         "xml-name-validator"
-      ]
-    },
-    "waddler@0.1.1_@electric-sql+pglite@0.5.8_@neondatabase+serverless@1.1.0_mysql2@3.22.3__@types+node@24.12.2_pg@8.22.0_postgres@3.4.9": {
-      "integrity": "sha512-lBJXYFBLEpYe+scAeCJmLj6Iqweuq1whM6Am3I9WfopOCFxvKz8Nq5hXoy8/b3zwJqHIQMglFIvM4skRydSpZg==",
-      "dependencies": [
-        "@electric-sql/pglite",
-        "@neondatabase/serverless",
-        "mysql2",
-        "pg",
-        "postgres"
-      ],
-      "optionalPeers": [
-        "@electric-sql/pglite",
-        "@neondatabase/serverless",
-        "mysql2",
-        "pg",
-        "postgres"
       ]
     },
     "wasm-feature-detect@1.8.0": {
@@ -16569,14 +16553,6 @@
     "zwitch@2.0.4": {
       "integrity": "sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A=="
     }
-  },
-  "remote": {
-    "https://edge.netlify.com/": "fd941d61d88673d5f28aab283fb86fcc50f08a3bc80ee5470498fcfa88c65cfb",
-    "https://edge.netlify.com/bootstrap/config.ts": "6a2ce0e544e15e8f8883a5c18da5948e37fd0f2619f68cb31f3af53c51817025",
-    "https://edge.netlify.com/bootstrap/context.ts": "e97240232121e2f369f6546ce961490f34d961ea1ea54be3ff09633e3f08373f",
-    "https://edge.netlify.com/bootstrap/cookie.ts": "8b0baae708989ca183c6f3b4ab3d029e6abcbc2e43f93edeb0ff447b3bbc3a05",
-    "https://edge.netlify.com/bootstrap/edge_function.ts": "b8253e86aa83c67341f5cfedeba5049d77fbf84dcab7eceff7566b7728ae9b39",
-    "https://edge.netlify.com/bootstrap/globals/types.ts": "eaa6148ded3121d8dee62dd91c86e7fe76601df0f3ca8d7962243a30f4c8935f"
   },
   "workspace": {
     "dependencies": [
