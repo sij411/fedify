@@ -47,6 +47,7 @@
     "package.json"
   ],
   "dependencies": {
+    "es-toolkit": "catalog:",
     "temporal-polyfill": "catalog:"
   },
   "peerDependencies": {

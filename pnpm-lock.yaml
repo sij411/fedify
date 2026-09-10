@@ -1658,6 +1658,9 @@ importers:
       '@netlify/async-workloads':
         specifier: 'catalog:'
         version: 0.0.106(@google-cloud/storage@5.20.5)(@trpc/server@11.18.0(typescript@6.0.3))(@types/react@19.1.8)(autoprefixer@10.5.0(postcss@8.5.19))(graphql@16.14.2)(postcss@8.5.19)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rollup@4.60.2)(tailwindcss@4.1.12)
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.46.1
       temporal-polyfill:
         specifier: 'catalog:'
         version: 1.0.1
