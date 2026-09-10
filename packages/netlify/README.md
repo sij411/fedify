@@ -33,17 +33,29 @@ The initial release targets Netlify Functions, not Netlify Edge Functions.
 Installation
 ------------
 
+For queue-only usage, install the package with Netlify Async Workloads:
+
 ~~~~ sh
-deno add jsr:@fedify/netlify npm:@netlify/async-workloads npm:@netlify/blobs  # Deno
-npm  add     @fedify/netlify @netlify/async-workloads @netlify/blobs         # npm
-pnpm add     @fedify/netlify @netlify/async-workloads @netlify/blobs         # pnpm
-yarn add     @fedify/netlify @netlify/async-workloads @netlify/blobs         # Yarn
-bun  add     @fedify/netlify @netlify/async-workloads @netlify/blobs         # Bun
+deno add jsr:@fedify/netlify npm:@netlify/async-workloads  # Deno
+npm  add     @fedify/netlify @netlify/async-workloads     # npm
+pnpm add     @fedify/netlify @netlify/async-workloads     # pnpm
+yarn add     @fedify/netlify @netlify/async-workloads     # Yarn
+bun  add     @fedify/netlify @netlify/async-workloads     # Bun
 ~~~~
 
 
 Usage
 -----
+
+To use `NetlifyBlobsKvStore`, also install Netlify Blobs:
+
+~~~~ sh
+deno add npm:@netlify/blobs  # Deno
+npm  add     @netlify/blobs  # npm
+pnpm add     @netlify/blobs  # pnpm
+yarn add     @netlify/blobs  # Yarn
+bun  add     @netlify/blobs  # Bun
+~~~~
 
 Create one store and queue for both the web application and the workload
 function.  `NetlifyBlobsKvStore` provides the compare-and-set (CAS) support
