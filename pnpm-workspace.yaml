@@ -80,7 +80,7 @@ catalog:
   "@multiformats/base-x": ^4.0.1
   "@nestjs/common": ^11.0.1
   "@netlify/async-workloads": ^0.0.106
-  "@netlify/blobs": ^11.0.3
+  "@netlify/blobs": 11.0.3
   "@netlify/database": ^1.1.0
   "@nuxt/kit": ^4.4.2
   "@nuxt/schema": ^4.4.2
