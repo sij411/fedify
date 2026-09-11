@@ -23,6 +23,7 @@ describe("package exports", () => {
 
   it("accepts the Netlify Blobs Store in the public types", {
     skip: !canRunTypeScript,
+    timeout: 60_000,
   }, () => {
     const require = createRequire(import.meta.url);
     const tsc = require.resolve("typescript/bin/tsc");
@@ -43,6 +44,6 @@ describe("package exports", () => {
       "--target",
       "ESNext",
       fixture,
-    ]);
+    ], { timeout: 55_000 });
   });
 });
