@@ -4,7 +4,8 @@
   "license": "MIT",
   "imports": {
     "@netlify/async-workloads": "npm:@netlify/async-workloads@^0.0.106",
-    "@netlify/blobs": "npm:@netlify/blobs@^11.0.3"
+    "@netlify/blobs": "npm:@netlify/blobs@^11.0.3",
+    "byte-encodings": "npm:byte-encodings@^1.0.11"
   },
   "exports": {
     ".": "./src/mod.ts"

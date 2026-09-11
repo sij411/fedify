@@ -16805,7 +16805,8 @@
       "packages/netlify": {
         "dependencies": [
           "npm:@netlify/async-workloads@^0.0.106",
-          "npm:@netlify/blobs@^11.0.3"
+          "npm:@netlify/blobs@^11.0.3",
+          "npm:byte-encodings@^1.0.11"
         ]
       },
       "packages/nuxt": {

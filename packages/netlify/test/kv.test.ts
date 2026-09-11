@@ -2,7 +2,8 @@ import "temporal-polyfill/global";
 import { deepStrictEqual, equal, ok, rejects } from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { KvKey } from "@fedify/fedify/federation";
-import type { SetOptions, Store } from "@netlify/blobs";
+import { getStore, type SetOptions, type Store } from "@netlify/blobs";
+import { encodeBase64Url } from "byte-encodings/base64url";
 import { NetlifyBlobsKvStore } from "../src/kv.ts";
 
 interface Entry {
@@ -92,6 +93,10 @@ function createKv(store: MockStore): NetlifyBlobsKvStore {
   return new NetlifyBlobsKvStore(store as unknown as Store);
 }
 
+function encodeKey(key: KvKey): string {
+  return `fedify1.${key.map((part) => encodeBase64Url(part)).join(".")}.`;
+}
+
 async function collect(
   entries: AsyncIterable<{ key: KvKey; value: unknown }>,
 ) {
@@ -126,7 +131,10 @@ describe("NetlifyBlobsKvStore", () => {
     await kv.delete(["missing"]);
 
     deepStrictEqual(await kv.get(["delete"]), undefined);
-    deepStrictEqual(store.deleteCalls, ['["delete"]', '["missing"]']);
+    deepStrictEqual(store.deleteCalls, [
+      encodeKey(["delete"]),
+      encodeKey(["missing"]),
+    ]);
   });
 
   it("stores TTL metadata and hides expired values", async () => {
@@ -136,11 +144,11 @@ describe("NetlifyBlobsKvStore", () => {
     await kv.set(["future"], "visible", {
       ttl: Temporal.Duration.from({ seconds: 1 }),
     });
-    const expires = store.entries.get('["future"]')?.metadata.expireIn;
+    const expires = store.entries.get(encodeKey(["future"]))?.metadata.expireIn;
     ok(typeof expires === "number");
     ok(expires >= before + 1_000);
 
-    store.entries.set('["expired"]', {
+    store.entries.set(encodeKey(["expired"]), {
       data: "hidden",
       etag: "expired",
       metadata: { expireIn: Date.now() - 1 },
@@ -161,7 +169,7 @@ describe("NetlifyBlobsKvStore", () => {
 
     await kv.set(["ttl-overwrite"], "persistent");
 
-    deepStrictEqual(store.entries.get('["ttl-overwrite"]')?.metadata, {
+    deepStrictEqual(store.entries.get(encodeKey(["ttl-overwrite"]))?.metadata, {
       expireIn: null,
     });
     deepStrictEqual(await kv.get(["ttl-overwrite"]), "persistent");
@@ -186,7 +194,7 @@ describe("NetlifyBlobsKvStore key encoding", () => {
     });
 
     deepStrictEqual(await collect(kv.list()), entries);
-    deepStrictEqual(store.listPrefixes, ["["]);
+    deepStrictEqual(store.listPrefixes, ["fedify1."]);
   });
 
   it("preserves tuple prefixes without matching partial components", async () => {
@@ -207,22 +215,58 @@ describe("NetlifyBlobsKvStore key encoding", () => {
       { key: ["actor", "alice", "inbox"], value: "descendant" },
     ]);
     deepStrictEqual(store.listPrefixes, [
-      '["actor"',
-      '["actor","alice"',
+      encodeKey(["actor"]),
+      encodeKey(["actor", "alice"]),
     ]);
   });
 
-  it("enforces the 600-byte UTF-8 key limit", async () => {
-    const kv = createKv(new MockStore());
+  it("keeps URL delimiters out of Netlify SDK request URLs", async () => {
+    const requestUrls: URL[] = [];
+    const store = getStore({
+      name: "test",
+      siteID: "site",
+      token: "token",
+      edgeURL: "https://example.com",
+      fetch: (input) => {
+        const url = input instanceof Request ? input.url : input.toString();
+        requestUrls.push(new URL(url));
+        return Promise.resolve(new Response(null, { status: 404 }));
+      },
+    });
+    const kv = new NetlifyBlobsKvStore(store);
+    const keys: KvKey[] = [
+      ["cache", "https://example.com/actor#key-1"],
+      ["cache", "https://example.com/actor#key-2"],
+      ["cache", "https://example.com/actor?key=1"],
+      ["cache", "https://example.com/actor?key=2"],
+    ];
 
-    await kv.set(["a".repeat(596)], "exactly 600 bytes");
+    for (const key of keys) deepStrictEqual(await kv.get(key), undefined);
+
+    equal(requestUrls.length, keys.length);
+    equal(new Set(requestUrls.map((url) => url.pathname)).size, keys.length);
+    for (const url of requestUrls) {
+      equal(url.hash, "");
+      equal(url.search, "");
+    }
+  });
+
+  it("enforces the 600-byte UTF-8 key limit", async () => {
+    const store = new MockStore();
+    const kv = createKv(store);
+
+    await kv.set(["a".repeat(443)], "exactly 600 encoded bytes");
     deepStrictEqual(
-      await kv.get(["a".repeat(596)]),
-      "exactly 600 bytes",
+      await kv.get(["a".repeat(443)]),
+      "exactly 600 encoded bytes",
+    );
+    equal(
+      new TextEncoder().encode(store.setCalls[0].key).byteLength,
+      600,
     );
 
     await rejects(
-      kv.set(["a".repeat(597)], "too long"),
+      kv.set(["a".repeat(444)], "too long"),
       new RangeError(
         "The encoded key exceeds Netlify Blobs' 600-byte key limit.",
       ),
@@ -239,12 +283,12 @@ describe("NetlifyBlobsKvStore key encoding", () => {
     const store = new MockStore();
     const kv = createKv(store);
     await kv.set(["listed", "visible"], "value");
-    store.entries.set('["listed","expired"]', {
+    store.entries.set(encodeKey(["listed", "expired"]), {
       data: "expired",
       etag: "expired",
       metadata: { expireIn: Date.now() - 1 },
     });
-    store.entries.set('["listed","deleted"]', {
+    store.entries.set(encodeKey(["listed", "deleted"]), {
       data: null,
       etag: "deleted",
       metadata: { tombstone: true },
@@ -274,7 +318,7 @@ describe("NetlifyBlobsKvStore.cas()", () => {
     const store = new MockStore();
     const kv = createKv(store);
     await kv.set(["update"], { count: 1 });
-    const etag = store.entries.get('["update"]')?.etag;
+    const etag = store.entries.get(encodeKey(["update"]))?.etag;
     store.setCalls.length = 0;
 
     equal(await kv.cas(["update"], { count: 0 }, { count: 2 }), false);
@@ -302,9 +346,9 @@ describe("NetlifyBlobsKvStore.cas()", () => {
     deepStrictEqual(await kv.cas(["deleted"], "value", undefined), true);
     deepStrictEqual(await kv.get(["deleted"]), undefined);
     deepStrictEqual(await collect(kv.list(["deleted"])), []);
-    deepStrictEqual(store.entries.get('["deleted"]')?.data, null);
+    deepStrictEqual(store.entries.get(encodeKey(["deleted"]))?.data, null);
     deepStrictEqual(
-      store.entries.get('["deleted"]')?.metadata,
+      store.entries.get(encodeKey(["deleted"]))?.metadata,
       { tombstone: true },
     );
   });
@@ -314,7 +358,7 @@ describe("NetlifyBlobsKvStore.cas()", () => {
     const kv = createKv(store);
     await kv.set(["recreate"], "old");
     await kv.cas(["recreate"], "old", undefined);
-    const tombstoneEtag = store.entries.get('["recreate"]')?.etag;
+    const tombstoneEtag = store.entries.get(encodeKey(["recreate"]))?.etag;
     store.setCalls.length = 0;
 
     equal(await kv.cas(["recreate"], undefined, "new"), true);
@@ -326,7 +370,7 @@ describe("NetlifyBlobsKvStore.cas()", () => {
   it("replaces an expired blob with its ETag", async () => {
     const store = new MockStore();
     const kv = createKv(store);
-    store.entries.set('["expired-cas"]', {
+    store.entries.set(encodeKey(["expired-cas"]), {
       data: "old",
       etag: "expired-etag",
       metadata: { expireIn: Date.now() - 1 },
@@ -385,7 +429,7 @@ describe("NetlifyBlobsKvStore.cas()", () => {
     await kv.set(["retry"], "old");
     store.setCalls.length = 0;
     store.beforeNextSet = () => {
-      store.entries.set('["retry"]', {
+      store.entries.set(encodeKey(["retry"]), {
         data: "old",
         etag: "competing-etag",
         metadata: { expireIn: null },
@@ -403,7 +447,7 @@ describe("NetlifyBlobsKvStore.cas()", () => {
     await kv.set(["delete-conflict"], "old");
     store.setCalls.length = 0;
     store.beforeNextSet = () => {
-      store.entries.set('["delete-conflict"]', {
+      store.entries.set(encodeKey(["delete-conflict"]), {
         data: "new",
         etag: "competing-etag",
         metadata: { expireIn: null },
@@ -427,7 +471,7 @@ describe("NetlifyBlobsKvStore.cas()", () => {
   it("rejects conditional writes when the ETag is missing", async () => {
     const store = new MockStore();
     const kv = createKv(store);
-    store.entries.set('["missing-etag"]', {
+    store.entries.set(encodeKey(["missing-etag"]), {
       data: "old",
       metadata: {},
     });

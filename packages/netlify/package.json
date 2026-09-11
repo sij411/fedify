@@ -47,6 +47,7 @@
     "package.json"
   ],
   "dependencies": {
+    "byte-encodings": "catalog:",
     "es-toolkit": "catalog:",
     "temporal-polyfill": "catalog:"
   },

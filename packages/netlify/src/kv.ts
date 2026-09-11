@@ -5,9 +5,13 @@ import type {
   KvStoreSetOptions,
 } from "@fedify/fedify/federation";
 import type { Store } from "@netlify/blobs";
+import { decodeBase64Url, encodeBase64Url } from "byte-encodings/base64url";
 import { isEqual } from "es-toolkit";
 
 const MAX_BLOB_KEY_BYTES = 600;
+const BLOB_KEY_PREFIX = "fedify1.";
+const BLOB_KEY_SEPARATOR = ".";
+const textDecoder = new TextDecoder();
 
 /**
  * A key-value store that uses Netlify Blobs.
@@ -26,7 +30,9 @@ export class NetlifyBlobsKvStore implements KvStore {
   }
 
   private serializeKey(key: KvKey): string {
-    const serialized = JSON.stringify(key);
+    const serialized = BLOB_KEY_PREFIX +
+      key.map((part) => encodeBase64Url(part)).join(BLOB_KEY_SEPARATOR) +
+      BLOB_KEY_SEPARATOR;
     if (new TextEncoder().encode(serialized).byteLength > MAX_BLOB_KEY_BYTES) {
       throw new RangeError(
         "The encoded key exceeds Netlify Blobs' 600-byte key limit.",
@@ -36,12 +42,16 @@ export class NetlifyBlobsKvStore implements KvStore {
   }
 
   private deserializeKey(key: string): KvKey {
-    return JSON.parse(key) as KvKey;
+    const encodedParts = key.slice(BLOB_KEY_PREFIX.length, -1).split(
+      BLOB_KEY_SEPARATOR,
+    );
+    return encodedParts.map((part) =>
+      textDecoder.decode(decodeBase64Url(part))
+    ) as [string, ...string[]];
   }
 
   private serializePrefix(prefix?: KvKey): string {
-    if (prefix == null) return "[";
-    return this.serializeKey(prefix).slice(0, -1);
+    return prefix == null ? BLOB_KEY_PREFIX : this.serializeKey(prefix);
   }
 
   private isAbsent(metadata: Record<string, unknown>): boolean {
