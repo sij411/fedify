@@ -18,4 +18,7 @@ export {
   NetlifyMessageQueueSendError,
   type NetlifyQueueEventData,
 } from "./mq.ts";
-export type { NetlifyAsyncWorkloadsClient } from "./types.ts";
+export type {
+  NetlifyAsyncWorkloadsClient,
+  NetlifyBlobsStore,
+} from "./types.ts";

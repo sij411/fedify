@@ -2,7 +2,7 @@ import "temporal-polyfill/global";
 import { deepStrictEqual, equal, ok, rejects } from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { KvKey } from "@fedify/fedify/federation";
-import { getStore, type SetOptions, type Store } from "@netlify/blobs";
+import { getStore, type SetOptions } from "@netlify/blobs";
 import { encodeBase64Url } from "byte-encodings/base64url";
 import { NetlifyBlobsKvStore } from "../src/kv.ts";
 
@@ -90,7 +90,7 @@ class MockStore {
 }
 
 function createKv(store: MockStore): NetlifyBlobsKvStore {
-  return new NetlifyBlobsKvStore(store as unknown as Store);
+  return new NetlifyBlobsKvStore(store);
 }
 
 function encodeKey(key: KvKey): string {

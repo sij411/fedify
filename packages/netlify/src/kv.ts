@@ -4,9 +4,9 @@ import type {
   KvStoreListEntry,
   KvStoreSetOptions,
 } from "@fedify/fedify/federation";
-import type { Store } from "@netlify/blobs";
 import { decodeBase64Url, encodeBase64Url } from "byte-encodings/base64url";
 import { isEqual } from "es-toolkit";
+import type { NetlifyBlobsStore } from "./types.ts";
 
 const MAX_BLOB_KEY_BYTES = 600;
 const BLOB_KEY_PREFIX = "fedify1.";
@@ -19,13 +19,13 @@ const textDecoder = new TextDecoder();
  * @since 2.4.0
  */
 export class NetlifyBlobsKvStore implements KvStore {
-  readonly #store: Store;
+  readonly #store: NetlifyBlobsStore;
 
   /**
    * Creates a new Netlify Blobs-backed key-value store.
    * @param store The Netlify Blobs store to use.
    */
-  constructor(store: Store) {
+  constructor(store: NetlifyBlobsStore) {
     this.#store = store;
   }
 
