@@ -83,14 +83,19 @@ which apply this check only to objects decoded with `fromJsonLd()` or
 `lookupObject()`. Objects passed to a constructor are trusted as they are, so a
 loader must not build remote data with constructors.
 
-Backfill also ignores loader results whose ID origin differs from the
-requested IRI's origin, including otherwise valid cross-origin redirects.
-Portable `ap:` and `ap+ef61:` identifiers are compared by DID, including
-valid FEP-ef61 compatible gateway identifiers.  The loader must verify portable
-proofs before returning these objects; matching origins alone do not
-authenticate their content.
-This does not replace the loader's validation: `BackfillDocumentLoader` does
-not expose the final response URL.
+For ordinary HTTP(S) objects, backfill checks the declared ID against the
+origin of the final response URL when the loader reports it.  A custom
+loader that retains the final URL can call
+`options?.reportDocumentUrl?.(finalUrl)` before returning the object.  Report
+the actual URL of the response used to parse that object.  When the loader
+returns only the object, as `lookupObject()` does, backfill checks its ID
+against the requested IRI instead.  A cross-origin redirect can pass the
+first check when the returned ID matches the final response's origin.
+
+Portable `ap:` and `ap+ef61:` identifiers are still compared against the
+requested reference by DID, including valid FEP-ef61 compatible gateway
+identifiers.  The loader must verify portable proofs before returning these
+objects.  Matching origins alone do not authenticate their content.
 
 Backfilled objects remain unverified remote data.  Applications should
 authenticate them before persisting or otherwise trusting them.

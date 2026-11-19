@@ -38,6 +38,16 @@ export interface BackfillDocumentLoaderOptions {
    * Cancellation signal for the current dereference operation.
    */
   readonly signal?: AbortSignal;
+
+  /**
+   * Reports the actual final HTTP(S) response URL for the object returned by
+   * this call. Call this before returning the object, after following redirects.
+   * Omit the report when the response URL is unavailable, including for
+   * cached objects whose response URL was not retained.
+   *
+   * @since 2.5.0
+   */
+  readonly reportDocumentUrl?: (url: URL) => void;
 }
 
 /**
@@ -48,13 +58,12 @@ export interface BackfillDocumentLoaderOptions {
  * provides this validation when its JSON-LD loader preserves the final URL in
  * `documentUrl`.
  *
- * Backfill also ignores results whose ID origin differs from the requested
- * IRI's origin, including otherwise valid cross-origin redirects.  Portable
- * `ap:` and `ap+ef61:` IRIs are compared by DID; valid FEP-ef61 compatible
- * gateway identifiers name that same DID rather than the gateway's host.
- * The loader must verify portable proofs before returning such objects.
- * This does not replace the loader's validation: the final response URL is
- * not exposed by this interface.
+ * For ordinary HTTP(S) lookups, backfill compares the returned ID with the
+ * origin of the reported final response URL, or with the requested IRI when
+ * the loader does not report a URL. Portable `ap:` and `ap+ef61:` IRIs are
+ * compared against the requested IRI by DID. Valid FEP-ef61 compatible gateway
+ * identifiers name that same DID. The loader must verify portable proofs
+ * before returning such objects.
  *
  * Origin validation does not authenticate the returned object's content.
  *

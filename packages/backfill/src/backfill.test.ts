@@ -43,6 +43,72 @@ test("context lookup reports an origin mismatch in throw mode", async () => {
   });
 });
 
+test("context lookup checks a reported response URL after a domain move", async () => {
+  const requestedUrl = new URL("https://old.example/conversation");
+  const finalUrl = new URL("https://new.example/conversation");
+  const item = new Note({ id: new URL("https://new.example/post") });
+  const seed = new Note({ contexts: [requestedUrl] });
+  const context: BackfillContext = {
+    documentLoader: (iri, options) => {
+      strictEqual(iri.href, requestedUrl.href);
+      options?.reportDocumentUrl?.(finalUrl);
+      return Promise.resolve(new Collection({ id: finalUrl, items: [item] }));
+    },
+  };
+
+  deepStrictEqual(
+    (await collect(context, seed, { maxRequests: 1 })).map(({ id }) => id),
+    [item.id],
+  );
+
+  const mismatched: BackfillContext = {
+    documentLoader: (_, options) => {
+      options?.reportDocumentUrl?.(finalUrl);
+      return Promise.resolve(
+        new Collection({ id: requestedUrl, items: [item] }),
+      );
+    },
+  };
+  deepStrictEqual(await collect(mismatched, seed), []);
+  await rejects(collect(mismatched, seed, { crossOrigin: "throw" }), {
+    name: "OriginMismatchError",
+  });
+});
+
+test("vocabulary accessors receive the final URL for items and pages", async () => {
+  const contextId = new URL("https://old.example/conversation");
+  const pageId = new URL("https://old.example/page/1");
+  const finalPageId = new URL("https://new.example/page/1");
+  const itemId = new URL("https://old.example/post");
+  const finalItemId = new URL("https://new.example/post");
+  const seed = new Note({ contexts: [contextId] });
+  const context: BackfillContext = {
+    documentLoader: (iri, options) => {
+      if (iri.href === contextId.href) {
+        return Promise.resolve(
+          new Collection({ id: contextId, first: pageId }),
+        );
+      }
+      if (iri.href === pageId.href) {
+        options?.reportDocumentUrl?.(finalPageId);
+        return Promise.resolve(
+          new CollectionPage({ id: finalPageId, items: [itemId] }),
+        );
+      }
+      if (iri.href === itemId.href) {
+        options?.reportDocumentUrl?.(finalItemId);
+        return Promise.resolve(new Note({ id: finalItemId }));
+      }
+      return Promise.resolve(null);
+    },
+  };
+
+  deepStrictEqual(
+    (await collect(context, seed, { maxRequests: 3 })).map(({ id }) => id),
+    [finalItemId],
+  );
+});
+
 test("Create object lookup reports an origin mismatch in throw mode", async () => {
   const contextId = new URL("https://example.com/conversation");
   const objectId = new URL("https://example.com/note");

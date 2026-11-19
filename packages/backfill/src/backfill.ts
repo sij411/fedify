@@ -62,12 +62,17 @@ function isTraversalError(
 interface RequestBudget {
   readonly signal?: AbortSignal;
   requestCount: number;
-  readonly documents: Map<string, Promise<APObject | null>>;
+  readonly documents: Map<string, Promise<LoadedObject | null>>;
   conversationCollection?: Promise<BackfillCollection | null>;
   readonly discovery?: {
     readonly copies: WeakMap<APObject, APObject>;
     readonly sources: WeakMap<APObject, APObject>;
   };
+}
+
+interface LoadedObject {
+  readonly object: APObject;
+  readonly documentUrl: string;
 }
 
 type StrategyItem = {
@@ -364,9 +369,10 @@ async function getConversationCollection(
   }
   const contextId = note.contextIds[0];
   if (contextId == null) return null;
-  const collection = await loadObject(context, contextId, options, budget, {
+  const loaded = await loadObject(context, contextId, options, budget, {
     skipLoaderErrors: true,
   });
+  const collection = loaded?.object ?? null;
   return isCollection(collection) ? collection : null;
 }
 
@@ -407,9 +413,10 @@ async function getContextHistoryCollection(
     // Malformed compatible identifiers are unavailable history.
     return null;
   }
-  const collection = await loadObject(context, historyId, options, budget, {
+  const loaded = await loadObject(context, historyId, options, budget, {
     skipLoaderErrors: true,
   });
+  const collection = loaded?.object ?? null;
   return isCollection(collection) ? collection : null;
 }
 
@@ -819,14 +826,14 @@ async function* getCollectionItems(
   };
   const pageOptions = {
     documentLoader: async (url: string) => {
-      const object = await loadObject(context, new URL(url), options, budget, {
+      const loaded = await loadObject(context, new URL(url), options, budget, {
         throwOnBudgetExceeded: true,
       });
-      if (object == null) throw new Error(`Collection page not found: ${url}`);
+      if (loaded == null) throw new Error(`Collection page not found: ${url}`);
       return {
         contextUrl: null,
-        documentUrl: url,
-        document: await object.toJsonLd(),
+        documentUrl: loaded.documentUrl,
+        document: await loaded.object.toJsonLd(),
       };
     },
     crossOrigin: options.crossOrigin ?? "ignore",
@@ -904,7 +911,7 @@ async function loadCollectionItemDocument(
     skipUnavailable?: boolean;
   } = {},
 ) {
-  let object: APObject | null;
+  let loaded: LoadedObject | null;
   try {
     const iri = parseIri(url);
     if (skipIds?.has(iri.href)) {
@@ -912,7 +919,7 @@ async function loadCollectionItemDocument(
         throw new Error(`Reply target already visited: ${url}`);
       return skippedCollectionItemDocument(url);
     }
-    object = await loadObject(context, iri, options, budget, {
+    loaded = await loadObject(context, iri, options, budget, {
       throwOnBudgetExceeded: true,
     });
   } catch (error) {
@@ -921,15 +928,16 @@ async function loadCollectionItemDocument(
     if (!skipUnavailable) throw error;
     return skippedCollectionItemDocument(url);
   }
-  if (object == null) {
+  if (loaded == null) {
     if (!skipUnavailable) throw new Error(`Reply target not found: ${url}`);
     return skippedCollectionItemDocument(url);
   }
+  const { object, documentUrl } = loaded;
   const document = await object.toJsonLd();
   onLoaded?.(object, document);
   return {
     contextUrl: null,
-    documentUrl: url,
+    documentUrl,
     document,
   };
 }
@@ -957,7 +965,7 @@ async function loadObject(
     throwOnBudgetExceeded?: boolean;
     skipLoaderErrors?: boolean;
   } = {},
-): Promise<APObject | null> {
+): Promise<LoadedObject | null> {
   budget.signal?.throwIfAborted();
   const cacheKey = iri.href;
   const cached = budget.documents.get(cacheKey);
@@ -982,22 +990,42 @@ async function loadObject(
   budget.signal?.throwIfAborted();
 
   budget.requestCount++;
-  let document: Promise<APObject | null> | undefined;
+  let document: Promise<LoadedObject | null> | undefined;
+  let responseUrl: URL | undefined;
   try {
     document = Promise.resolve(
-      context.documentLoader(iri, { signal: budget.signal }),
+      context.documentLoader(iri, {
+        signal: budget.signal,
+        reportDocumentUrl: (url) => {
+          responseUrl = new URL(url.href);
+        },
+      }),
     ).then((object) => {
-      if (object?.id == null) return object;
+      if (object == null) return null;
+      if (object.id == null) return { object, documentUrl: iri.href };
       try {
         // A compatible gateway identifier names the DID in its validated
         // path, not the gateway host.  The loader still verifies the proof;
         // this comparison only prevents crossing the requested origin.
         const requested = fromCompatibleEf61Id(iri) ?? iri;
         const returned = fromCompatibleEf61Id(object.id) ?? object.id;
-        if (haveSameIriOrigin(returned, requested)) return object;
+        // Response URLs anchor ordinary web lookups. Portable objects still
+        // have to match the DID of the requested reference.
+        const finalUrl =
+          responseUrl != null &&
+          isWebUrl(requested) &&
+          isWebUrl(returned) &&
+          isWebUrl(responseUrl) &&
+          fromCompatibleEf61Id(responseUrl) == null
+            ? responseUrl
+            : undefined;
+        const originAnchor = finalUrl ?? requested;
+        if (haveSameIriOrigin(returned, originAnchor)) {
+          return { object, documentUrl: (finalUrl ?? iri).href };
+        }
         if (options.crossOrigin === "throw") {
           throw new OriginMismatchError(
-            `Backfill lookup returned an object from a different origin: ${iri.href}`,
+            `Backfill lookup returned an object from a different origin: ${originAnchor.href}`,
           );
         }
         return null;
@@ -1019,6 +1047,10 @@ async function loadObject(
     }
     throw error;
   }
+}
+
+function isWebUrl(url: URL): boolean {
+  return url.protocol === "https:" || url.protocol === "http:";
 }
 
 async function waitForInterval(

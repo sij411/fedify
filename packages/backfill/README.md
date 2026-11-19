@@ -86,12 +86,13 @@ which apply this check only to objects decoded with `fromJsonLd()` or
 `lookupObject()`.  Objects passed to a constructor are trusted as they are, so
 a loader must not build remote data with constructors.
 
-Backfill additionally ignores loader results whose ID origin differs from the
-requested IRI's origin, including otherwise valid cross-origin redirects.
-An ID with an opaque origin, such as a `did:` IRI, matches the requested IRI
-only when the two IRIs are identical.
-This does not replace the loader's validation: `BackfillDocumentLoader` does
-not expose the final response URL.
+For ordinary HTTP(S) objects, backfill checks the declared ID against the
+origin of the final response URL if the loader reports it by calling
+`options?.reportDocumentUrl?.(finalUrl)` before returning the object.  Use the
+actual URL of the response used to parse the returned object.  Without a
+report, backfill compares the returned ID with the requested IRI.  Portable
+identifiers still use the requested reference's DID, and the loader must
+verify portable proofs.
 
 The seed object itself is not yielded.  If it appears in the discovered
 collection, it is skipped by ID.
