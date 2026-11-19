@@ -183,6 +183,26 @@ export interface BackfillOptions<
    * Cancels traversal before requests and before yields.
    */
   readonly signal?: AbortSignal;
+
+  /**
+   * Controls how backfill resolves cross-origin object references.
+   *
+   * - `"ignore"` (default): Dereference cross-origin embedded objects by their
+   *   ID and skip lookup results that fail the origin check.
+   * - `"throw"`: Dereference cross-origin embedded objects by their ID and
+   *   report origin mismatches from vocabulary accessors and the shared
+   *   document lookup as errors.
+   * - `"trust"`: Allow vocabulary accessors to use cross-origin embedded
+   *   objects directly. The shared document lookup still checks the origin of
+   *   fetched objects. Validate backfilled objects before persisting them.
+   *
+   * With `"ignore"` and `"throw"`, dereferencing an embedded object can call
+   * {@link BackfillContext.documentLoader}. Each call counts against
+   * {@link BackfillOptions.maxRequests}.
+   *
+   * @since 2.5.0
+   */
+  readonly crossOrigin?: "ignore" | "throw" | "trust";
 }
 
 /**

@@ -41,13 +41,21 @@ export class MaxRequestsExceeded extends Error {}
 
 class IntervalConfigurationError extends Error {}
 
+class OriginMismatchError extends Error {
+  override name = "OriginMismatchError";
+}
+
 /** Errors that must escape unavailable-document handling. */
 function isTraversalError(
   error: unknown,
-): error is MaxRequestsExceeded | IntervalConfigurationError {
+): error is
+  | MaxRequestsExceeded
+  | IntervalConfigurationError
+  | OriginMismatchError {
   return (
     error instanceof MaxRequestsExceeded ||
-    error instanceof IntervalConfigurationError
+    error instanceof IntervalConfigurationError ||
+    error instanceof OriginMismatchError
   );
 }
 
@@ -376,9 +384,10 @@ async function getContextHistoryCollection(
   try {
     history = await note.getContextHistory({
       dereference: false,
-      crossOrigin: "ignore",
+      crossOrigin: options.crossOrigin ?? "ignore",
     });
-  } catch {
+  } catch (error) {
+    if (isTraversalError(error)) throw error;
     budget.signal?.throwIfAborted();
     return null;
   }
@@ -580,6 +589,7 @@ async function* getReplyTargets(
   let traversalError:
     | MaxRequestsExceeded
     | IntervalConfigurationError
+    | OriginMismatchError
     | undefined;
   const loadedObjects = new Map<string, APObject>();
   const observesGeneratedCache =
@@ -630,7 +640,7 @@ async function* getReplyTargets(
           throw error;
         }
       },
-      crossOrigin: "ignore",
+      crossOrigin: options.crossOrigin ?? "ignore",
     })) {
       budget.signal?.throwIfAborted();
       if (traversalError != null) throw traversalError;
@@ -704,7 +714,7 @@ async function getRepliesCollection(
       documentLoader: async (url) => {
         return await loadCollectionItemDocument(context, url, options, budget);
       },
-      crossOrigin: "ignore",
+      crossOrigin: options.crossOrigin ?? "ignore",
     });
   } catch (error) {
     if (isTraversalError(error)) throw error;
@@ -805,7 +815,7 @@ async function* getCollectionItems(
         skipIds,
       );
     },
-    crossOrigin: "ignore" as const,
+    crossOrigin: options.crossOrigin ?? "ignore",
   };
   const pageOptions = {
     documentLoader: async (url: string) => {
@@ -819,7 +829,7 @@ async function* getCollectionItems(
         document: await object.toJsonLd(),
       };
     },
-    crossOrigin: "ignore" as const,
+    crossOrigin: options.crossOrigin ?? "ignore",
   };
   const visitedIds = new Set<string>();
   const visitedPages = new WeakSet<BackfillCollection>();
@@ -871,7 +881,7 @@ async function getCreateActivityObject(
       documentLoader: async (url) => {
         return await loadCollectionItemDocument(context, url, options, budget);
       },
-      crossOrigin: "ignore",
+      crossOrigin: options.crossOrigin ?? "ignore",
     });
   } catch (error) {
     if (isTraversalError(error)) throw error;
@@ -984,7 +994,13 @@ async function loadObject(
         // this comparison only prevents crossing the requested origin.
         const requested = fromCompatibleEf61Id(iri) ?? iri;
         const returned = fromCompatibleEf61Id(object.id) ?? object.id;
-        return haveSameIriOrigin(returned, requested) ? object : null;
+        if (haveSameIriOrigin(returned, requested)) return object;
+        if (options.crossOrigin === "throw") {
+          throw new OriginMismatchError(
+            `Backfill lookup returned an object from a different origin: ${iri.href}`,
+          );
+        }
+        return null;
       } catch (error) {
         if (error instanceof TypeError) return null;
         throw error;
@@ -996,6 +1012,7 @@ async function loadObject(
     if (budget.documents.get(cacheKey) === document) {
       budget.documents.delete(cacheKey);
     }
+    if (error instanceof OriginMismatchError) throw error;
     if (skipLoaderErrors) {
       budget.signal?.throwIfAborted();
       return null;

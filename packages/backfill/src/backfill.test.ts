@@ -23,6 +23,54 @@ async function collect(
   return await Array.fromAsync(backfill(context, note, options));
 }
 
+test("context lookup reports an origin mismatch in throw mode", async () => {
+  const reference = new URL("https://example.com/conversation");
+  const seed = new Note({ contexts: [reference] });
+  const context: BackfillContext = {
+    documentLoader: () =>
+      Promise.resolve(
+        new Collection({
+          id: new URL("https://example.org/conversation"),
+          items: [new Note({ id: new URL("https://example.org/note") })],
+        }),
+      ),
+  };
+
+  deepStrictEqual(await collect(context, seed), []);
+  await rejects(collect(context, seed, { crossOrigin: "throw" }), {
+    name: "OriginMismatchError",
+    message: /Backfill lookup returned an object from a different origin/,
+  });
+});
+
+test("Create object lookup reports an origin mismatch in throw mode", async () => {
+  const contextId = new URL("https://example.com/conversation");
+  const objectId = new URL("https://example.com/note");
+  const seed = new Note({ contexts: [contextId] });
+  const context: BackfillContext = {
+    documentLoader: (iri) => {
+      if (iri.href === contextId.href) {
+        return Promise.resolve(
+          new Collection({
+            id: contextId,
+            items: [new Create({ object: objectId })],
+          }),
+        );
+      }
+      strictEqual(iri.href, objectId.href);
+      return Promise.resolve(
+        new Note({ id: new URL("https://example.org/note") }),
+      );
+    },
+  };
+
+  deepStrictEqual(await collect(context, seed), []);
+  await rejects(collect(context, seed, { crossOrigin: "throw" }), {
+    name: "OriginMismatchError",
+    message: /Backfill lookup returned an object from a different origin/,
+  });
+});
+
 describe("interval configuration errors", () => {
   for (const source of [
     "ancestor discovery",
@@ -1028,7 +1076,7 @@ describe("ancestor collection discovery", () => {
     deepStrictEqual(context.requests, [parentId.href, contextId.href]);
   });
 
-  test("a vocabulary lookup failure allows later reply targets", async () => {
+  test("throw mode still skips ordinary vocabulary lookup failures", async () => {
     const context = loader([
       [contextId.href, new Collection({ items: [sibling] })],
     ]);
@@ -1042,6 +1090,7 @@ describe("ancestor collection discovery", () => {
     });
     const results = await collect(context, seed, {
       contextDiscovery: "ancestors",
+      crossOrigin: "throw",
     });
     deepStrictEqual(
       results.map(({ id }) => id),
