@@ -83,19 +83,34 @@ which apply this check only to objects decoded with `fromJsonLd()` or
 `lookupObject()`. Objects passed to a constructor are trusted as they are, so a
 loader must not build remote data with constructors.
 
-For ordinary HTTP(S) objects, backfill checks the declared ID against the
-origin of the final response URL when the loader reports it.  A custom
+When checking an ordinary HTTP(S) object's origin, backfill compares its ID
+with the origin of the final response URL when the loader reports it.  A custom
 loader that retains the final URL can call
 `options?.reportDocumentUrl?.(finalUrl)` before returning the object.  Report
 the actual URL of the response used to parse that object.  When the loader
 returns only the object, as `lookupObject()` does, backfill checks its ID
-against the requested IRI instead.  A cross-origin redirect can pass the
-first check when the returned ID matches the final response's origin.
+against the requested IRI instead.  A cross-origin redirect can pass the first
+check when the returned ID matches the final response's origin.
 
 Portable `ap:` and `ap+ef61:` identifiers are still compared against the
 requested reference by DID, including valid FEP-ef61 compatible gateway
 identifiers.  The loader must verify portable proofs before returning these
 objects.  Matching origins alone do not authenticate their content.
+
+Set `crossOrigin` on the backfill options to control how traversal handles
+cross-origin objects:
+
+ -  `"ignore"` (default) dereferences cross-origin embedded objects by ID
+    and skips fetched objects that fail backfill's origin check.
+ -  `"throw"` also dereferences embedded objects by ID and raises an error
+    when a fetched object fails that check.
+ -  `"trust"` allows ordinary HTTP(S) objects regardless of origin, whether
+    embedded or fetched. Loader validation and portable identity checks still
+    apply. Only use this mode if you validate the returned objects before
+    persisting them.
+
+In `"ignore"` and `"throw"` modes, dereferencing an embedded object may make
+an extra `documentLoader` call that counts against `maxRequests`.
 
 Backfilled objects remain unverified remote data.  Applications should
 authenticate them before persisting or otherwise trusting them.

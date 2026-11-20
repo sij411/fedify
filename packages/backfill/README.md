@@ -86,13 +86,24 @@ which apply this check only to objects decoded with `fromJsonLd()` or
 `lookupObject()`.  Objects passed to a constructor are trusted as they are, so
 a loader must not build remote data with constructors.
 
-For ordinary HTTP(S) objects, backfill checks the declared ID against the
-origin of the final response URL if the loader reports it by calling
+When checking an ordinary HTTP(S) object's origin, backfill compares its ID
+with the origin of the final response URL if the loader reports it by calling
 `options?.reportDocumentUrl?.(finalUrl)` before returning the object.  Use the
 actual URL of the response used to parse the returned object.  Without a
 report, backfill compares the returned ID with the requested IRI.  Portable
-identifiers still use the requested reference's DID, and the loader must
-verify portable proofs.
+identifiers still use the requested reference's DID, and the loader must verify
+portable proofs.
+
+`BackfillOptions.crossOrigin` defaults to `"ignore"`, which dereferences
+cross-origin embedded objects by ID and skips fetched objects that fail
+backfill's origin check. `"throw"` reports an origin mismatch as an error.
+In both modes, dereferencing an embedded object can make an extra
+`documentLoader` call that counts against `maxRequests`.
+
+`"trust"` allows ordinary HTTP(S) objects regardless of origin, whether
+embedded or fetched. Loader validation and portable identity checks still
+apply. Only use `"trust"` if you validate returned objects before persisting
+them.
 
 The seed object itself is not yielded.  If it appears in the discovered
 collection, it is skipped by ID.

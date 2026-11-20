@@ -1012,16 +1012,19 @@ async function loadObject(
         // Response URLs anchor ordinary web lookups. Portable objects still
         // have to match the DID of the requested reference. Anonymous web
         // objects also need the response URL to resolve relative references.
-        const finalUrl =
-          responseUrl != null &&
+        const ordinaryWebLookup =
           isWebUrl(requested) &&
           (returned == null || isWebUrl(returned)) &&
-          isWebUrl(responseUrl) &&
-          fromCompatibleEf61Id(responseUrl) == null
-            ? responseUrl
-            : undefined;
+          (responseUrl == null ||
+            (isWebUrl(responseUrl) &&
+              fromCompatibleEf61Id(responseUrl) == null));
+        const finalUrl = ordinaryWebLookup ? responseUrl : undefined;
         const originAnchor = finalUrl ?? requested;
-        if (returned == null || haveSameIriOrigin(returned, originAnchor)) {
+        if (
+          returned == null ||
+          (ordinaryWebLookup && options.crossOrigin === "trust") ||
+          haveSameIriOrigin(returned, originAnchor)
+        ) {
           return { object, documentUrl: (finalUrl ?? iri).href };
         }
         if (options.crossOrigin === "throw") {

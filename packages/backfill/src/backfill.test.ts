@@ -23,7 +23,7 @@ async function collect(
   return await Array.fromAsync(backfill(context, note, options));
 }
 
-test("context lookup reports an origin mismatch in throw mode", async () => {
+test("context lookup applies the origin policy without a reported URL", async () => {
   const reference = new URL("https://example.com/conversation");
   const seed = new Note({ contexts: [reference] });
   const context: BackfillContext = {
@@ -41,6 +41,12 @@ test("context lookup reports an origin mismatch in throw mode", async () => {
     name: "OriginMismatchError",
     message: /Backfill lookup returned an object from a different origin/,
   });
+  deepStrictEqual(
+    (await collect(context, seed, { crossOrigin: "trust" })).map(
+      ({ id }) => id,
+    ),
+    [new URL("https://example.org/note")],
+  );
 });
 
 test("context lookup checks a reported response URL after a domain move", async () => {
@@ -73,6 +79,34 @@ test("context lookup checks a reported response URL after a domain move", async 
   await rejects(collect(mismatched, seed, { crossOrigin: "throw" }), {
     name: "OriginMismatchError",
   });
+  deepStrictEqual(
+    (await collect(mismatched, seed, { crossOrigin: "trust" })).map(
+      ({ id }) => id,
+    ),
+    [item.id],
+  );
+});
+
+test("trust keeps the requested DID check for portable collections", async () => {
+  const requested = parseIri("ap+ef61://did:key:z6MkAlice/conversation");
+  const returned = parseIri("ap+ef61://did:key:z6MkBob/conversation");
+  const finalUrl = new URL("https://gateway.example/conversation");
+  const items = await collect(
+    {
+      documentLoader: (_, options) => {
+        options?.reportDocumentUrl?.(finalUrl);
+        return Promise.resolve(
+          new Collection({
+            id: returned,
+            items: [new Note({ id: new URL("https://example.org/note") })],
+          }),
+        );
+      },
+    },
+    new Note({ contexts: [requested] }),
+    { crossOrigin: "trust" },
+  );
+  deepStrictEqual(items, []);
 });
 
 test("vocabulary accessors receive the final URL for items and pages", async () => {
