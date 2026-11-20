@@ -1002,25 +1002,26 @@ async function loadObject(
       }),
     ).then((object) => {
       if (object == null) return null;
-      if (object.id == null) return { object, documentUrl: iri.href };
+      const id = object.id;
       try {
         // A compatible gateway identifier names the DID in its validated
         // path, not the gateway host.  The loader still verifies the proof;
         // this comparison only prevents crossing the requested origin.
         const requested = fromCompatibleEf61Id(iri) ?? iri;
-        const returned = fromCompatibleEf61Id(object.id) ?? object.id;
+        const returned = id == null ? null : (fromCompatibleEf61Id(id) ?? id);
         // Response URLs anchor ordinary web lookups. Portable objects still
-        // have to match the DID of the requested reference.
+        // have to match the DID of the requested reference. Anonymous web
+        // objects also need the response URL to resolve relative references.
         const finalUrl =
           responseUrl != null &&
           isWebUrl(requested) &&
-          isWebUrl(returned) &&
+          (returned == null || isWebUrl(returned)) &&
           isWebUrl(responseUrl) &&
           fromCompatibleEf61Id(responseUrl) == null
             ? responseUrl
             : undefined;
         const originAnchor = finalUrl ?? requested;
-        if (haveSameIriOrigin(returned, originAnchor)) {
+        if (returned == null || haveSameIriOrigin(returned, originAnchor)) {
           return { object, documentUrl: (finalUrl ?? iri).href };
         }
         if (options.crossOrigin === "throw") {
@@ -1030,7 +1031,9 @@ async function loadObject(
         }
         return null;
       } catch (error) {
-        if (error instanceof TypeError) return null;
+        if (error instanceof TypeError) {
+          return id == null ? { object, documentUrl: iri.href } : null;
+        }
         throw error;
       }
     });

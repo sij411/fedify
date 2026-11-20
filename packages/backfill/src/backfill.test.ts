@@ -109,6 +109,52 @@ test("vocabulary accessors receive the final URL for items and pages", async () 
   );
 });
 
+test("anonymous collection pages resolve relative items against the final URL", async () => {
+  const contextId = new URL("https://old.example/conversation");
+  const pageUrl = new URL("https://old.example/pages/first");
+  const finalUrl = new URL("https://new.example/archive/pages/first");
+  const itemId = new URL("https://new.example/archive/pages/posts/42");
+  const page = await CollectionPage.fromJsonLd(
+    {
+      "@context": "https://www.w3.org/ns/activitystreams",
+      type: "CollectionPage",
+      items: ["posts/42"],
+    },
+    { baseUrl: finalUrl },
+  );
+  strictEqual(page.id, null);
+
+  const requested: string[] = [];
+  const items = await collect(
+    {
+      documentLoader: (iri, options) => {
+        requested.push(iri.href);
+        if (iri.href === contextId.href) {
+          return Promise.resolve(
+            new Collection({ id: contextId, first: pageUrl }),
+          );
+        }
+        if (iri.href === pageUrl.href) {
+          options?.reportDocumentUrl?.(finalUrl);
+          return Promise.resolve(page);
+        }
+        if (iri.href === itemId.href) {
+          return Promise.resolve(new Note({ id: itemId }));
+        }
+        return Promise.resolve(null);
+      },
+    },
+    new Note({ contexts: [contextId] }),
+    { maxRequests: 3 },
+  );
+
+  deepStrictEqual(requested, [contextId.href, pageUrl.href, itemId.href]);
+  deepStrictEqual(
+    items.map(({ id }) => id),
+    [itemId],
+  );
+});
+
 test("Create object lookup reports an origin mismatch in throw mode", async () => {
   const contextId = new URL("https://example.com/conversation");
   const objectId = new URL("https://example.com/note");
