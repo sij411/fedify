@@ -217,6 +217,130 @@ test("Create object lookup reports an origin mismatch in throw mode", async () =
   });
 });
 
+describe("origin policy for embedded references", () => {
+  const context = "https://forum.example/conversation";
+  const item = "https://posts.example/note";
+  const replies = "https://posts.example/replies";
+  const post = { type: "Note", id: item };
+  const activityStreams = "https://www.w3.org/ns/activitystreams";
+  const sources = [
+    { name: "reply targets", reference: { inReplyTo: post }, iri: item },
+    {
+      name: "replies collections",
+      reference: {
+        replies: { type: "Collection", id: replies, items: [post] },
+      },
+      iri: replies,
+    },
+    { name: "collection items", reference: { context }, iri: item },
+  ];
+
+  for (const { name, reference, iri } of sources) {
+    test(`${name} honor throw and trust`, async () => {
+      for (const crossOrigin of ["throw", "trust"] as const) {
+        const seed = await Note.fromJsonLd({
+          "@context": activityStreams,
+          type: "Note",
+          id: "https://forum.example/seed",
+          ...reference,
+        });
+        const contextCollection = await Collection.fromJsonLd({
+          "@context": activityStreams,
+          type: "Collection",
+          id: context,
+          items: [post],
+        });
+        const requested: string[] = [];
+        const results = collect(
+          {
+            documentLoader: (url) => {
+              requested.push(url.href);
+              if (url.href === context) {
+                return Promise.resolve(contextCollection);
+              }
+              // The custom loader returns the parsed object after a domain
+              // move but does not report the final response URL.
+              const moved = new URL(
+                "https://archive.example/" + url.pathname.slice(1),
+              );
+              return Promise.resolve(
+                url.href === replies
+                  ? new Collection({ id: moved })
+                  : new Note({ id: moved }),
+              );
+            },
+          },
+          seed,
+          { crossOrigin, strategies: ["context-auto", "reply-tree"] },
+        );
+        const expectedRequests = name === "collection items" ? [context] : [];
+        if (crossOrigin === "throw") {
+          await rejects(results, { name: "OriginMismatchError" });
+          expectedRequests.push(iri);
+        } else {
+          deepStrictEqual(
+            (await results).map(({ id }) => id?.href),
+            [item],
+          );
+        }
+        deepStrictEqual(requested, expectedRequests);
+      }
+    });
+  }
+});
+
+describe("limits on cross-origin embedded reply targets", () => {
+  const unavailable = "https://unavailable.example/post";
+  const parent = "https://parent.example/post";
+  const ancestor = "https://ancestor.example/post";
+  const sibling = "https://sibling.example/post";
+  const activityStreams = "https://www.w3.org/ns/activitystreams";
+
+  for (const [limit, expectedRequests, expectedItems] of [
+    ["maxRequests", [unavailable], []],
+    ["maxItems", [unavailable, parent], [parent]],
+    ["maxDepth", [unavailable, parent, sibling], [parent, sibling]],
+  ] as const) {
+    test(`${limit} bounds traversal after an embedded target is dereferenced`, async () => {
+      const seed = await Note.fromJsonLd({
+        "@context": activityStreams,
+        type: "Note",
+        id: "https://forum.example/seed",
+        inReplyTo: [
+          { type: "Note", id: unavailable },
+          { type: "Note", id: parent },
+          { type: "Note", id: sibling },
+        ],
+      });
+      const loadedParent = await Note.fromJsonLd({
+        "@context": activityStreams,
+        type: "Note",
+        id: parent,
+        inReplyTo: { type: "Note", id: ancestor },
+      });
+      const requested: string[] = [];
+      const results = await collect(
+        {
+          documentLoader: (url) => {
+            requested.push(url.href);
+            if (url.href === unavailable) return Promise.resolve(null);
+            return Promise.resolve(
+              url.href === parent ? loadedParent : new Note({ id: url }),
+            );
+          },
+        },
+        seed,
+        { strategies: ["reply-tree"], crossOrigin: "ignore", [limit]: 1 },
+      );
+      deepStrictEqual(requested, expectedRequests);
+      deepStrictEqual(
+        results.map(({ id }) => id?.href),
+        expectedItems,
+      );
+    });
+  }
+});
+
 describe("interval configuration errors", () => {
   for (const source of [
     "ancestor discovery",
