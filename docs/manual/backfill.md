@@ -72,12 +72,11 @@ for await (
 }
 ~~~~
 
-Custom `BackfillDocumentLoader` implementations must validate the returned
-object's declared ID against the final response URL after redirects.  Pass a
-custom JSON-LD `DocumentLoader` to `lookupObject()` instead of fetching JSON
-and parsing it directly with `fromJsonLd()`.  The JSON-LD loader must set
-`documentUrl` to the final response URL so `lookupObject()` can perform this
-validation. `lookupObject()` checks only the top-level object's origin. Backfill
+Custom `BackfillDocumentLoader` implementations are responsible for validating
+the objects they return. For origin validation, pass a custom JSON-LD
+`DocumentLoader` to `lookupObject()` and have it set `documentUrl` to the
+final response URL after redirects. By default, `lookupObject()` checks the
+top-level object's declared ID against that origin. Backfill
 dereferences cross-origin embedded objects through the vocabulary accessors,
 which apply this check only to objects decoded with `fromJsonLd()` or
 `lookupObject()`. Objects passed to a constructor are trusted as they are, so a
@@ -89,8 +88,10 @@ loader that retains the final URL can call
 `options?.reportDocumentUrl?.(finalUrl)` before returning the object.  Report
 the actual URL of the response used to parse that object.  When the loader
 returns only the object, as `lookupObject()` does, backfill checks its ID
-against the requested IRI instead.  A cross-origin redirect can pass the first
-check when the returned ID matches the final response's origin.
+against the requested IRI instead. A reported final URL lets cross-origin
+redirects pass the check when the returned ID matches the final response's
+origin. Backfill also uses the reported URL to resolve relative links, even
+when an ordinary HTTP(S) object has no ID.
 
 Portable `ap:` and `ap+ef61:` identifiers are still compared against the
 requested reference by DID, including valid FEP-ef61 compatible gateway
@@ -106,8 +107,13 @@ cross-origin objects:
     when a fetched object fails that check.
  -  `"trust"` allows ordinary HTTP(S) objects regardless of origin, whether
     embedded or fetched. Loader validation and portable identity checks still
-    apply. Only use this mode if you validate the returned objects before
-    persisting them.
+    apply. This can expose applications to content spoofing. Only use this
+    mode if you validate the returned objects before persisting them.
+
+Backfill's `crossOrigin` controls its own checks. If the loader has already
+skipped an object, backfill cannot recover it with `"trust"` or report an
+origin mismatch with `"throw"`. For example, `lookupObject()` returns `null`
+on an ordinary origin mismatch under its default policy.
 
 In `"ignore"` and `"throw"` modes, dereferencing an embedded object may make
 an extra `documentLoader` call that counts against `maxRequests`.
@@ -352,11 +358,12 @@ Dereferenced documents are cached in memory for one `backfill()` traversal.
 Applications that need persistent or shared caching can implement it in the
 provided `documentLoader`.
 
-Failed external dereferences are skipped so other conversation items can still
-be discovered. Thrown loader errors are not retained in the traversal cache,
-allowing the same IRI to be retried if another traversal path reaches it.
-A returned `null` is cached for the rest of the traversal. Aborting the
-provided signal stops traversal instead of skipping the request.
-Errors cloning embedded history and errors in interval configuration during
-collection source resolution also propagate. Neither these errors nor
-cancellation trigger source fallback or allow later strategies to continue.
+Ordinary dereference failures are skipped so other conversation items can
+still be discovered. Thrown loader errors are not retained in the traversal
+cache, allowing the same IRI to be retried if another traversal path reaches
+it. A returned `null` is cached for the rest of the traversal.
+
+An origin mismatch raised in `"throw"` mode stops traversal. Cancellation,
+errors cloning embedded history, and interval configuration errors also stop
+traversal. These cases do not trigger source fallback or allow later
+strategies to continue.

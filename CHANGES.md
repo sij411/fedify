@@ -176,6 +176,19 @@ To be released.
 
 ### @fedify/backfill
 
+ -  Added `BackfillOptions.crossOrigin` to control origin checks for embedded
+    and fetched objects. The default `"ignore"` dereferences cross-origin
+    embedded objects by ID and skips fetched origin mismatches. `"throw"`
+    reports a mismatch as an error. Any resulting loader calls count against
+    `maxRequests`. `"trust"` relaxes origin checks for ordinary HTTP(S)
+    objects and can expose applications to content spoofing. Validate results
+    before persisting them. Portable identity checks still apply.
+    [[#1427] by Jiwon Kwon\]
+
+    Loaders can report the final response URL with `reportDocumentUrl()` so
+    backfill can validate legitimate redirects and resolve relative links
+    against the URL that served the object.
+
  -  Added `contextDiscovery: "ancestors"` to backfill options to find the
     nearest usable conversation collection through `inReplyTo` ancestors when
     the seed has none. Discovery respects `maxDepth`, shares traversal budgets
@@ -184,6 +197,7 @@ To be released.
     reply-target parsing failures, even when ancestor discovery is disabled.
     Reply-target lookups now propagate `interval` configuration errors.
     [[#1252], [#1416] by Jiwon Kwon\]
+
  -  Added `contextSource: "history-first"` to backfill options to read the
     seed's first `contextHistory` collection, falling back to `context` when
     history is absent or unavailable. A resolved empty history does not trigger
@@ -195,6 +209,7 @@ To be released.
 
 [#1252]: https://github.com/fedify-dev/fedify/issues/1252
 [#1416]: https://github.com/fedify-dev/fedify/pull/1416
+[#1427]: https://github.com/fedify-dev/fedify/issues/1427
 
 ### @fedify/cfworkers
 

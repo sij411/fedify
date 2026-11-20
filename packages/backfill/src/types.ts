@@ -53,18 +53,17 @@ export interface BackfillDocumentLoaderOptions {
 /**
  * Dereferences an ActivityPub object or collection IRI.
  *
- * Implementations must validate the returned object's declared ID against the
- * final response URL after redirects.  `lookupObject()` from `@fedify/vocab`
- * provides this validation when its JSON-LD loader preserves the final URL in
- * `documentUrl`.
+ * Loaders are responsible for validating the objects they return. By default,
+ * `lookupObject()` from `@fedify/vocab` checks the declared ID's origin against
+ * the final response URL when its JSON-LD loader preserves it in `documentUrl`.
+ * {@link BackfillOptions.crossOrigin} controls backfill's checks. It cannot
+ * recover an object the loader has already rejected or skipped.
  *
- * For ordinary HTTP(S) lookups, backfill's origin check compares the returned
- * ID with the reported final response URL, or with the requested IRI when the
- * loader does not report a URL. Callers can opt out of this backfill check
- * with {@link BackfillOptions.crossOrigin}. Portable `ap:` and `ap+ef61:` IRIs are
- * compared against the requested IRI by DID. Valid FEP-ef61 compatible gateway
- * identifiers name that same DID. The loader must verify portable proofs
- * before returning such objects.
+ * For ordinary HTTP(S) lookups, backfill compares the returned ID's origin with
+ * that of the reported final URL, or the requested IRI if no URL was reported.
+ * Portable `ap:` and `ap+ef61:` IRIs use the requested IRI's DID. Valid FEP-ef61
+ * compatible gateway identifiers name that same DID. The loader must verify
+ * portable proofs before returning such objects.
  *
  * Origin validation does not authenticate the returned object's content.
  *
@@ -204,7 +203,8 @@ export interface BackfillOptions<
    *   document lookup as errors.
    * - `"trust"`: Allow cross-origin ordinary HTTP(S) objects, whether embedded
    *   or fetched. Loader validation and portable identity checks still apply.
-   *   Only use this mode when you validate objects before persisting them.
+   *   This can expose applications to content spoofing. Only use this mode
+   *   when you validate objects before persisting them.
    *
    * With `"ignore"` and `"throw"`, dereferencing an embedded object can call
    * {@link BackfillContext.documentLoader}. Each call counts against

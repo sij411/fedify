@@ -60,10 +60,9 @@ for await (
 }
 ~~~~
 
-Custom `BackfillDocumentLoader` implementations must validate an object's
-declared ID against the final response URL after redirects.  Fetching JSON
-and parsing it directly with `fromJsonLd()` loses that retrieval provenance.
-Pass a custom JSON-LD loader through `lookupObject()` instead:
+Custom `BackfillDocumentLoader` implementations are responsible for validating
+the objects they return. For origin validation, pass a custom JSON-LD loader
+through `lookupObject()`:
 
 ~~~~ typescript
 import { type DocumentLoader, lookupObject } from "@fedify/vocab";
@@ -102,8 +101,12 @@ In both modes, dereferencing an embedded object can make an extra
 
 `"trust"` allows ordinary HTTP(S) objects regardless of origin, whether
 embedded or fetched. Loader validation and portable identity checks still
-apply. Only use `"trust"` if you validate returned objects before persisting
-them.
+apply. This can expose applications to content spoofing. Only use `"trust"`
+if you validate returned objects before persisting them.
+
+Backfill's `crossOrigin` controls its own checks. When a loader such as the
+one above skips an object, backfill cannot recover it with `"trust"` or report
+the loader's origin mismatch with `"throw"`.
 
 The seed object itself is not yielded.  If it appears in the discovered
 collection, it is skipped by ID.
@@ -196,7 +199,8 @@ All configured strategies share the same traversal controls:
  -  `maxItems` limits the number of yielded objects.  Skipped duplicates do
     not count.
  -  `maxRequests` limits calls to `documentLoader`.  Embedded objects and
-    collections, including embedded pages, do not count.
+    collections, including embedded pages, do not count when accepted without
+    fetching.
  -  `maxDepth` limits reply-tree traversal and ancestor collection discovery,
     and defaults to 10. It does not limit context collection items.
  -  `interval` adds a delay between loader requests.  Its callback receives
@@ -208,12 +212,11 @@ An `interval` string requires the global `Temporal` API or a polyfill.
 
 Without history selection or ancestor discovery, if the seed has no context,
 or its context resolves to a non-collection, context strategies yield nothing.
-Loader failures are skipped unless traversal is aborted. If the context
-collection cannot be loaded, later
-configured strategies can still run.  Failed loads consume a request, and
+Ordinary loader failures are skipped. If the context collection is unavailable,
+later configured strategies can still run. Failed loads consume a request, and
 later strategies can use embedded data even when the request budget is
-exhausted.  Configuration errors, such as an invalid `interval`, still
-propagate.
+exhausted. Origin mismatches raised in `"throw"` mode, cancellation, and
+configuration errors such as an invalid `interval` stop traversal.
 
 Dereferenced documents are cached in memory for one `backfill()` traversal.
 Applications that need persistent or shared caching can provide it through

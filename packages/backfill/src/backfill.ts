@@ -604,8 +604,8 @@ async function* getReplyTargets(
   let replyTargetIdsBeforeLoad: readonly URL[] | undefined;
   try {
     for await (const target of object.getReplyTargets({
-      // Skip vocabulary-level failures per target rather than closing the
-      // iterator before its remaining reply targets can be explored.
+      // Skip ordinary vocabulary lookup failures so later targets can still be
+      // explored. Origin mismatches raised in "throw" mode still escape.
       suppressError: true,
       documentLoader: async (url) => {
         loadedObjects.clear();
@@ -1004,9 +1004,8 @@ async function loadObject(
       if (object == null) return null;
       const id = object.id;
       try {
-        // A compatible gateway identifier names the DID in its validated
-        // path, not the gateway host.  The loader still verifies the proof;
-        // this comparison only prevents crossing the requested origin.
+        // For a compatible gateway identifier, use the DID in its validated
+        // path as the origin. The loader still verifies the portable proof.
         const requested = fromCompatibleEf61Id(iri) ?? iri;
         const returned = id == null ? null : (fromCompatibleEf61Id(id) ?? id);
         // Response URLs anchor ordinary web lookups. Portable objects still
