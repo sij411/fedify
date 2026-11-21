@@ -221,7 +221,7 @@ describe("origin policy for embedded references", () => {
   const context = "https://forum.example/conversation";
   const item = "https://posts.example/note";
   const replies = "https://posts.example/replies";
-  const post = { type: "Note", id: item };
+  const post = { type: "Note", id: item, content: "embedded content" };
   const activityStreams = "https://www.w3.org/ns/activitystreams";
   const sources = [
     { name: "reply targets", reference: { inReplyTo: post }, iri: item },
@@ -236,8 +236,8 @@ describe("origin policy for embedded references", () => {
   ];
 
   for (const { name, reference, iri } of sources) {
-    test(`${name} honor throw and trust`, async () => {
-      for (const crossOrigin of ["throw", "trust"] as const) {
+    test(`${name} honor the default, throw, and trust policies`, async () => {
+      for (const crossOrigin of [undefined, "throw", "trust"] as const) {
         const seed = await Note.fromJsonLd({
           "@context": activityStreams,
           type: "Note",
@@ -277,11 +277,14 @@ describe("origin policy for embedded references", () => {
         if (crossOrigin === "throw") {
           await rejects(results, { name: "OriginMismatchError" });
           expectedRequests.push(iri);
-        } else {
+        } else if (crossOrigin === "trust") {
           deepStrictEqual(
-            (await results).map(({ id }) => id?.href),
-            [item],
+            (await results).map(({ id, object }) => [id?.href, object.content]),
+            [[item, post.content]],
           );
+        } else {
+          deepStrictEqual(await results, []);
+          expectedRequests.push(iri);
         }
         deepStrictEqual(requested, expectedRequests);
       }

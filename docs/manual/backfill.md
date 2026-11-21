@@ -90,8 +90,9 @@ the actual URL of the response used to parse that object.  When the loader
 returns only the object, as `lookupObject()` does, backfill checks its ID
 against the requested IRI instead. A reported final URL lets cross-origin
 redirects pass the check when the returned ID matches the final response's
-origin. Backfill also uses the reported URL to resolve relative links, even
-when an ordinary HTTP(S) object has no ID.
+origin. The loader should parse the document against the final response URL.
+Backfill preserves that URL as the base when a vocabulary accessor reparses
+the object, including ordinary HTTP(S) objects without an ID.
 
 Portable `ap:` and `ap+ef61:` identifiers are still compared against the
 requested reference by DID, including valid FEP-ef61 compatible gateway
@@ -105,10 +106,18 @@ cross-origin objects:
     and skips fetched objects that fail backfill's origin check.
  -  `"throw"` also dereferences embedded objects by ID and raises an error
     when a fetched object fails that check.
- -  `"trust"` allows ordinary HTTP(S) objects regardless of origin, whether
-    embedded or fetched. Loader validation and portable identity checks still
-    apply. This can expose applications to content spoofing. Only use this
-    mode if you validate the returned objects before persisting them.
+ -  `"trust"` lets vocabulary accessors use cross-origin embedded objects
+    subject to their portable-object rules. For fetched objects, backfill
+    bypasses its origin check only for ordinary HTTP(S) lookups. Loader
+    validation still applies. This can expose applications to content
+    spoofing. Only use this mode if you validate the returned objects
+    before persisting them.
+
+An embedded object can have a portable ID even when the containing object
+has an ordinary HTTP(S) ID. The accessor applies portable verification
+rules when it has a portable verifier or the containing object is in a
+portable chain. Outside that mode, `"trust"` can accept an embedded object
+with a portable ID.
 
 Backfill's `crossOrigin` controls its own checks. If the loader has already
 skipped an object, backfill cannot recover it with `"trust"` or report an

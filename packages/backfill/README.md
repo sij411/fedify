@@ -99,10 +99,13 @@ backfill's origin check. `"throw"` reports an origin mismatch as an error.
 In both modes, dereferencing an embedded object can make an extra
 `documentLoader` call that counts against `maxRequests`.
 
-`"trust"` allows ordinary HTTP(S) objects regardless of origin, whether
-embedded or fetched. Loader validation and portable identity checks still
-apply. This can expose applications to content spoofing. Only use `"trust"`
-if you validate returned objects before persisting them.
+`"trust"` lets vocabulary accessors use cross-origin embedded objects,
+subject to their portable-object rules. An accessor outside portable mode
+can also accept an embedded object with a portable ID. For fetched objects,
+backfill bypasses its origin check only for ordinary HTTP(S) lookups.
+Loader validation still applies. This can expose applications to content
+spoofing. Only use `"trust"` if you validate returned objects before
+persisting them.
 
 Backfill's `crossOrigin` controls its own checks. When a loader such as the
 one above skips an object, backfill cannot recover it with `"trust"` or report

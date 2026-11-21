@@ -59,8 +59,9 @@ export interface BackfillDocumentLoaderOptions {
  * {@link BackfillOptions.crossOrigin} controls backfill's checks. It cannot
  * recover an object the loader has already rejected or skipped.
  *
- * For ordinary HTTP(S) lookups, backfill compares the returned ID's origin with
- * that of the reported final URL, or the requested IRI if no URL was reported.
+ * When checking an ordinary HTTP(S) lookup, backfill compares the returned
+ * ID's origin with that of the reported final URL, or the requested IRI if
+ * no URL was reported.
  * Portable `ap:` and `ap+ef61:` IRIs use the requested IRI's DID. Valid FEP-ef61
  * compatible gateway identifiers name that same DID. The loader must verify
  * portable proofs before returning such objects.
@@ -200,10 +201,12 @@ export interface BackfillOptions<
    *   ID and skip lookup results that fail the origin check.
    * - `"throw"`: Dereference cross-origin embedded objects by their ID and
    *   raise an error when a fetched object fails backfill's origin check.
-   * - `"trust"`: Allow cross-origin ordinary HTTP(S) objects, whether embedded
-   *   or fetched. Loader validation and portable identity checks still apply.
-   *   This can expose applications to content spoofing. Only use this mode
-   *   when you validate objects before persisting them.
+   * - `"trust"`: Let vocabulary accessors accept cross-origin embedded objects
+   *   under their portable-object rules. Outside portable mode, this can
+   *   include embedded objects with portable IDs. Backfill bypasses its own
+   *   origin check only for ordinary HTTP(S) fetches. Loader validation
+   *   still applies. This can expose applications to content spoofing. Only
+   *   use this mode when you validate objects before persisting them.
    *
    * With `"ignore"` and `"throw"`, dereferencing an embedded object can call
    * {@link BackfillContext.documentLoader}. Each call counts against

@@ -6,11 +6,12 @@ links:
     and fetched objects. The default `"ignore"` dereferences cross-origin
     embedded objects by ID and skips fetched origin mismatches. `"throw"`
     reports a mismatch as an error. Any resulting loader calls count against
-    `maxRequests`. `"trust"` relaxes origin checks for ordinary HTTP(S)
-    objects and can expose applications to content spoofing. Validate results
-    before persisting them. Portable identity checks still apply.
+    `maxRequests`. `"trust"` uses the vocabulary's trust policy for embedded
+    objects and bypasses backfill's origin check for ordinary HTTP(S) fetches.
+    This can expose applications to content spoofing. Validate results
+    before persisting them. Fetched portable IDs still use the requested DID.
     [[#1427] by Jiwon Kwon]
 
     Loaders can report the final response URL with `reportDocumentUrl()` so
-    backfill can validate legitimate redirects and resolve relative links
-    against the URL that served the object.
+    backfill can validate legitimate redirects and preserve the response URL
+    as the base when a vocabulary accessor reparses the object.
