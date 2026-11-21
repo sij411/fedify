@@ -289,6 +289,62 @@ describe("origin policy for embedded references", () => {
   }
 });
 
+describe("retrying unavailable references on reused vocabulary objects", () => {
+  const requested = new URL("https://old.example/reference");
+  const moved = new URL("https://new.example/reference");
+  const noteId = new URL("https://new.example/post");
+  const contextId = new URL("https://old.example/conversation");
+
+  for (const property of ["replyTarget", "replies", "items"] as const) {
+    test(`${property} can be fetched again after an unavailable result`, async () => {
+      const seed = new Note(
+        property === "items"
+          ? { contexts: [contextId] }
+          : { [property]: requested },
+      );
+      const collection = new Collection({ id: contextId, items: [requested] });
+      const item = new Note({ id: property === "replies" ? noteId : moved });
+      const fetched =
+        property === "replies"
+          ? new Collection({ id: moved, items: [item] })
+          : item;
+      const requests: string[] = [];
+      let available = false;
+      const context: BackfillContext = {
+        documentLoader: (url) => {
+          requests.push(url.href);
+          if (url.href === contextId.href) return Promise.resolve(collection);
+          return Promise.resolve(
+            available && url.href === requested.href ? fetched : null,
+          );
+        },
+      };
+      const strategies =
+        property === "items"
+          ? (["context-auto"] as const)
+          : (["reply-tree"] as const);
+
+      deepStrictEqual(await collect(context, seed, { strategies }), []);
+      available = true;
+      await rejects(
+        collect(context, seed, { strategies, crossOrigin: "throw" }),
+        { name: "OriginMismatchError" },
+      );
+      deepStrictEqual(
+        (
+          await collect(context, seed, { strategies, crossOrigin: "trust" })
+        ).map(({ id }) => id),
+        [item.id],
+      );
+      const perCall =
+        property === "items"
+          ? [contextId.href, requested.href]
+          : [requested.href];
+      deepStrictEqual(requests, [...perCall, ...perCall, ...perCall]);
+    });
+  }
+});
+
 describe("limits on cross-origin embedded reply targets", () => {
   const unavailable = "https://unavailable.example/post";
   const parent = "https://parent.example/post";

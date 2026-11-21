@@ -115,6 +115,16 @@ skipped an object, backfill cannot recover it with `"trust"` or report an
 origin mismatch with `"throw"`. For example, `lookupObject()` returns `null`
 on an ordinary origin mismatch under its default policy.
 
+::: warning Previously hydrated references
+An earlier backfill call or a direct vocabulary accessor call using
+`crossOrigin: "trust"` can replace a reference on a shared seed or loader
+result with a fetched object. Later `"ignore"` and `"throw"` traversals can
+reuse that object without checking its origin again. To apply a stricter
+policy, pass a freshly parsed seed and have the loader return freshly parsed
+objects from the original documents. Copying an already hydrated object
+carries over its cached values.
+:::
+
 In `"ignore"` and `"throw"` modes, dereferencing an embedded object may make
 an extra `documentLoader` call that counts against `maxRequests`.
 

@@ -199,8 +199,7 @@ export interface BackfillOptions<
    * - `"ignore"` (default): Dereference cross-origin embedded objects by their
    *   ID and skip lookup results that fail the origin check.
    * - `"throw"`: Dereference cross-origin embedded objects by their ID and
-   *   report origin mismatches from vocabulary accessors and the shared
-   *   document lookup as errors.
+   *   raise an error when a fetched object fails backfill's origin check.
    * - `"trust"`: Allow cross-origin ordinary HTTP(S) objects, whether embedded
    *   or fetched. Loader validation and portable identity checks still apply.
    *   This can expose applications to content spoofing. Only use this mode
@@ -209,6 +208,12 @@ export interface BackfillOptions<
    * With `"ignore"` and `"throw"`, dereferencing an embedded object can call
    * {@link BackfillContext.documentLoader}. Each call counts against
    * {@link BackfillOptions.maxRequests}.
+   *
+   * A backfill or vocabulary accessor call using `"trust"` can hydrate a
+   * shared seed or loader result. Later `"ignore"` and `"throw"` traversals
+   * can reuse the cached object without checking its origin again. Use seeds
+   * and loader results freshly parsed from their original documents when
+   * applying a stricter policy.
    *
    * @since 2.5.0
    */

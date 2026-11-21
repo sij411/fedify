@@ -108,6 +108,13 @@ Backfill's `crossOrigin` controls its own checks. When a loader such as the
 one above skips an object, backfill cannot recover it with `"trust"` or report
 the loader's origin mismatch with `"throw"`.
 
+> [!WARNING]
+> Backfill and direct vocabulary accessor calls can hydrate a shared seed or
+> loader result in `"trust"` mode. Later `"ignore"` and `"throw"` traversals can
+> reuse the cached object without checking its origin again. Use seeds and
+> loader results freshly parsed from their original documents when applying
+> a stricter policy.
+
 The seed object itself is not yielded.  If it appears in the discovered
 collection, it is skipped by ID.
 
@@ -115,9 +122,9 @@ Context and `replies` collections support inline items and pagination through
 `first` and successive `next` links.  A collection page used as the starting
 collection also follows `next`.  Pages are loaded as needed, and traversal
 stops on repeated page links.  Pagination does not increase reply-tree depth.
-If a page cannot be loaded, items already yielded are retained and later
-configured strategies can continue unless cancellation or traversal limits
-stop them.
+After an ordinary page load failure, items already yielded are retained and
+later configured strategies can continue. An origin mismatch raised in
+`"throw"` mode stops traversal.
 
 Configured strategies run in order.  They share `maxItems`, `maxRequests`,
 abort state, and object ID deduplication; if two strategies discover the same

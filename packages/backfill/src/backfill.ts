@@ -45,13 +45,13 @@ class OriginMismatchError extends Error {
   override name = "OriginMismatchError";
 }
 
-/** Errors that must escape unavailable-document handling. */
-function isTraversalError(
-  error: unknown,
-): error is
+type TraversalError =
   | MaxRequestsExceeded
   | IntervalConfigurationError
-  | OriginMismatchError {
+  | OriginMismatchError;
+
+/** Errors that must escape unavailable-document handling. */
+function isTraversalError(error: unknown): error is TraversalError {
   return (
     error instanceof MaxRequestsExceeded ||
     error instanceof IntervalConfigurationError ||
@@ -593,11 +593,7 @@ async function* getReplyTargets(
     continueAfterBudgetExceeded?: boolean;
   } = {},
 ): AsyncIterable<APObject | Link> {
-  let traversalError:
-    | MaxRequestsExceeded
-    | IntervalConfigurationError
-    | OriginMismatchError
-    | undefined;
+  let traversalError: TraversalError | undefined;
   const loadedObjects = new Map<string, APObject>();
   const observesGeneratedCache =
     object.getReplyTargets === APObject.prototype.getReplyTargets;
@@ -605,7 +601,7 @@ async function* getReplyTargets(
   try {
     for await (const target of object.getReplyTargets({
       // Skip ordinary vocabulary lookup failures so later targets can still be
-      // explored. Origin mismatches raised in "throw" mode still escape.
+      // explored. The loader records errors that must escape this suppression.
       suppressError: true,
       documentLoader: async (url) => {
         loadedObjects.clear();
@@ -628,9 +624,6 @@ async function* getReplyTargets(
                   : (object, document) => {
                       loadedObjects.set(JSON.stringify(document), object);
                     },
-              // Let suppressError skip unavailable references without caching
-              // successful placeholders that would prevent later retries.
-              skipUnavailable: budget.discovery == null,
             },
           );
         } catch (error) {
@@ -655,7 +648,7 @@ async function* getReplyTargets(
       // Keep it across strategy passes, including targets cached by reply-tree.
       // Match documents rather than IDs to support anonymous targets.
       if (loadedObjects.size > 0 && target instanceof APObject) {
-        // A successful fetch changes cached URL identities, unless the target
+        // A successful fetch changes cached URL identities unless the target
         // is an unverified portable claim. Otherwise, discard the stale source.
         // Custom accessors keep their existing behavior pending exact association:
         // https://github.com/fedify-dev/fedify/issues/1423
@@ -680,6 +673,7 @@ async function* getReplyTargets(
     budget.signal?.throwIfAborted();
     if (traversalError != null) throw traversalError;
   } catch (error) {
+    if (traversalError != null) throw traversalError;
     if (isTraversalError(error)) throw error;
     budget.signal?.throwIfAborted();
   }
@@ -812,15 +806,23 @@ async function* getCollectionItems(
   budget: RequestBudget,
   skipIds?: ReadonlySet<string>,
 ): AsyncIterable<APObject | Link> {
+  let traversalError: TraversalError | undefined;
   const itemOptions = {
+    suppressError: true,
     documentLoader: async (url: string) => {
-      return await loadCollectionItemDocument(
-        context,
-        url,
-        options,
-        budget,
-        skipIds,
-      );
+      if (traversalError != null) throw traversalError;
+      try {
+        return await loadCollectionItemDocument(
+          context,
+          url,
+          options,
+          budget,
+          skipIds,
+        );
+      } catch (error) {
+        if (isTraversalError(error)) traversalError = error;
+        throw error;
+      }
     },
     crossOrigin: options.crossOrigin ?? "ignore",
   };
@@ -849,7 +851,13 @@ async function* getCollectionItems(
       visitedIds.add(current.id.href);
     }
     visitedPages.add(current);
-    yield* current.getItems(itemOptions);
+    for await (const item of current.getItems(itemOptions)) {
+      budget.signal?.throwIfAborted();
+      if (traversalError != null) throw traversalError;
+      yield item;
+    }
+    budget.signal?.throwIfAborted();
+    if (traversalError != null) throw traversalError;
 
     const page: CollectionPage | OrderedCollectionPage | null =
       current instanceof CollectionPage ||
@@ -905,32 +913,17 @@ async function loadCollectionItemDocument(
   skipIds?: ReadonlySet<string>,
   {
     onLoaded,
-    skipUnavailable = true,
   }: {
     onLoaded?: (object: APObject, document: unknown) => void;
-    skipUnavailable?: boolean;
   } = {},
 ) {
-  let loaded: LoadedObject | null;
-  try {
-    const iri = parseIri(url);
-    if (skipIds?.has(iri.href)) {
-      if (!skipUnavailable)
-        throw new Error(`Reply target already visited: ${url}`);
-      return skippedCollectionItemDocument(url);
-    }
-    loaded = await loadObject(context, iri, options, budget, {
-      throwOnBudgetExceeded: true,
-    });
-  } catch (error) {
-    if (isTraversalError(error)) throw error;
-    budget.signal?.throwIfAborted();
-    if (!skipUnavailable) throw error;
-    return skippedCollectionItemDocument(url);
-  }
+  const iri = parseIri(url);
+  if (skipIds?.has(iri.href)) throw new Error(`Object already visited: ${url}`);
+  const loaded = await loadObject(context, iri, options, budget, {
+    throwOnBudgetExceeded: true,
+  });
   if (loaded == null) {
-    if (!skipUnavailable) throw new Error(`Reply target not found: ${url}`);
-    return skippedCollectionItemDocument(url);
+    throw new Error(`Object not found: ${url}`);
   }
   const { object, documentUrl } = loaded;
   const document = await object.toJsonLd();
@@ -939,17 +932,6 @@ async function loadCollectionItemDocument(
     contextUrl: null,
     documentUrl,
     document,
-  };
-}
-
-function skippedCollectionItemDocument(url: string) {
-  return {
-    contextUrl: null,
-    documentUrl: url,
-    document: {
-      "@context": "https://www.w3.org/ns/activitystreams",
-      type: "Activity",
-    },
   };
 }
 
